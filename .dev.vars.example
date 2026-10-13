@@ -1,0 +1,9 @@
+SUPABASE_URL=https://SEU-PROJETO.supabase.co
+SUPABASE_ANON_KEY=chave_publica_anon
+SUPABASE_SERVICE_ROLE_KEY=segredo_somente_servidor
+STRIPE_SECRET_KEY=sk_test_ou_sk_live
+STRIPE_PRICE_ID=price_plano_mensal
+STRIPE_WEBHOOK_SECRET=whsec_segredo
+OPENAI_API_KEY=sk_segredo
+OPENAI_TRANSCRIBE_MODEL=gpt-4o-mini-transcribe
+AI_DAILY_LIMIT=10
