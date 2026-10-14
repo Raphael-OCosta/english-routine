@@ -780,7 +780,35 @@ Ambiente: Produção
 ```
 
 4. Salve.
-5. Faça uma nova implantação do projeto Pages para garantir que a função receba o segredo.
+5. Ainda dentro do projeto `english-routine`, abra a aba **Implantações** (em algumas telas aparece como **Deployments**).
+6. Na lista, localize a implantação de **Produção** mais recente, ligada à branch `main`.
+7. Abra o menu de três pontos dessa implantação. Se o menu não aparecer na lista, clique primeiro em **Exibir detalhes**.
+8. Clique em **Repetir implantação**, **Retry deployment** ou **Redeploy** — o texto varia conforme o idioma e a versão do painel.
+9. Confirme que deseja reutilizar o mesmo commit. Não escolha **Rollback/Reverter**.
+10. Aguarde o status mudar para **Sucesso/Success** e confirme que essa implantação aparece como a produção atual.
+
+Essa repetição é necessária porque o segredo precisa existir antes de a função ser implantada. O endereço do site não muda e você não precisa editar nenhum arquivo. Se a Cloudflare não mostrar a opção de repetir, um novo commit na branch `main` também inicia uma implantação automática do projeto conectado ao GitHub.
+
+Para conferir depois da implantação:
+
+1. Volte ao destino do webhook no Stripe.
+2. Se **Enviar evento de teste/Send test event** abrir uma janela pedindo o Stripe CLI, isso não é uma falha do webhook. Feche essa janela.
+3. No canto superior direito do painel Stripe, abra o **Stripe Shell**, identificado pelo ícone de terminal `>_`.
+4. No terminal que abrir dentro do próprio navegador, execute:
+
+```text
+stripe trigger checkout.session.completed
+```
+
+5. Aguarde a mensagem `Trigger succeeded!`.
+6. Volte ao destino do webhook e abra **Entregas de eventos/Event deliveries**.
+7. Abra o evento `checkout.session.completed` mais recente e confirme resposta HTTP `200` ou estado **Entregue/Delivered**.
+
+O Stripe Shell evita instalar programas no Windows. Como alternativa, o mesmo comando pode ser executado depois de instalar o Stripe CLI e fazer `stripe login`.
+
+Se uma versão anterior da função responder HTTP `500` com `invalid input syntax for type uuid: ""`, a assinatura já foi aceita: o evento artificial apenas não trouxe o UUID de um aluno. A função atual reconhece esse caso de teste e devolve HTTP `200` sem alterar perfis. Aguarde o deploy automático do commit corretivo e execute novamente `stripe trigger checkout.session.completed`.
+
+Não revele nem copie o conteúdo de `STRIPE_WEBHOOK_SECRET` para a tela do teste.
 
 ### Resultado esperado
 
