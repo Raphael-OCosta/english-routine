@@ -2,6 +2,7 @@
   window.ENGLISH_DAILY_CLOUD = true;
   const KEY = 'english-daily-v1';
   const PENDING_KEY = `${KEY}-cloud-pending`;
+  const RELOAD_GUARD_KEY = `${KEY}-cloud-reload-once`;
   let client;
   let user;
   let ready = false;
@@ -172,51 +173,57 @@
       return;
     }
 
-    const localRaw = localStorage.getItem(KEY);
-    const hasPendingLocal = Boolean(localStorage.getItem(PENDING_KEY));
-    const { data, error } = await client.from('progress_snapshots').select('state').maybeSingle();
-    if (error) {
-      location.href = '/dashboard.html';
-      return;
-    }
-
-    let canonicalState = null;
-    if (hasPendingLocal && localRaw) {
-      canonicalState = mergeStates(data?.state || {}, JSON.parse(localRaw));
-      const { error: uploadError } = await client.from('progress_snapshots').upsert({
-        user_id: user.id,
-        state: canonicalState,
-        updated_at: new Date().toISOString(),
-      });
-      if (uploadError) {
-        originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
-      } else {
-        originalRemoveItem.call(localStorage, PENDING_KEY);
-      }
-    } else if (data?.state && Object.keys(data.state).length) {
-      canonicalState = data.state;
-    } else if (localRaw) {
-      canonicalState = JSON.parse(localRaw);
-      const { error: uploadError } = await client.from('progress_snapshots').upsert({
-        user_id: user.id,
-        state: canonicalState,
-        updated_at: new Date().toISOString(),
-      });
-      if (uploadError) originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
-    }
-
-    if (canonicalState) {
-      const canonicalRaw = JSON.stringify(canonicalState);
-      let localState = null;
-      try {
-        localState = localRaw ? JSON.parse(localRaw) : null;
-      } catch (error) {
-        localState = null;
-      }
-      if (stableJson(canonicalState) !== stableJson(localState)) {
-        originalSetItem.call(localStorage, KEY, canonicalRaw);
-        location.reload();
+    const skipHydrationOnce = sessionStorage.getItem(RELOAD_GUARD_KEY) === user.id;
+    if (skipHydrationOnce) {
+      sessionStorage.removeItem(RELOAD_GUARD_KEY);
+    } else {
+      const localRaw = localStorage.getItem(KEY);
+      const hasPendingLocal = Boolean(localStorage.getItem(PENDING_KEY));
+      const { data, error } = await client.from('progress_snapshots').select('state').maybeSingle();
+      if (error) {
+        location.href = '/dashboard.html';
         return;
+      }
+
+      let canonicalState = null;
+      if (hasPendingLocal && localRaw) {
+        canonicalState = mergeStates(data?.state || {}, JSON.parse(localRaw));
+        const { error: uploadError } = await client.from('progress_snapshots').upsert({
+          user_id: user.id,
+          state: canonicalState,
+          updated_at: new Date().toISOString(),
+        });
+        if (uploadError) {
+          originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
+        } else {
+          originalRemoveItem.call(localStorage, PENDING_KEY);
+        }
+      } else if (data?.state && Object.keys(data.state).length) {
+        canonicalState = data.state;
+      } else if (localRaw) {
+        canonicalState = JSON.parse(localRaw);
+        const { error: uploadError } = await client.from('progress_snapshots').upsert({
+          user_id: user.id,
+          state: canonicalState,
+          updated_at: new Date().toISOString(),
+        });
+        if (uploadError) originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
+      }
+
+      if (canonicalState) {
+        const canonicalRaw = JSON.stringify(canonicalState);
+        let localState = null;
+        try {
+          localState = localRaw ? JSON.parse(localRaw) : null;
+        } catch (error) {
+          localState = null;
+        }
+        if (stableJson(canonicalState) !== stableJson(localState)) {
+          originalSetItem.call(localStorage, KEY, canonicalRaw);
+          sessionStorage.setItem(RELOAD_GUARD_KEY, user.id);
+          location.reload();
+          return;
+        }
       }
     }
 
