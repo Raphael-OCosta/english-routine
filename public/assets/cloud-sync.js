@@ -2,6 +2,7 @@
   window.ENGLISH_DAILY_CLOUD = true;
   const KEY = 'english-daily-v1';
   const PENDING_KEY = `${KEY}-cloud-pending`;
+  const HYDRATED_PARAM = 'cloud_hydrated';
   let client;
   let user;
   let ready = false;
@@ -40,6 +41,23 @@
   function durableJson(value) {
     if (!value || typeof value !== 'object') return stableJson(value);
     return stableJson({ ...value, session: null });
+  }
+
+  function hydrationMarked() {
+    return new URL(location.href).searchParams.get(HYDRATED_PARAM) === '1';
+  }
+
+  function clearHydrationMark() {
+    const url = new URL(location.href);
+    if (!url.searchParams.has(HYDRATED_PARAM)) return;
+    url.searchParams.delete(HYDRATED_PARAM);
+    history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+  }
+
+  function reloadAfterHydration() {
+    const url = new URL(location.href);
+    url.searchParams.set(HYDRATED_PARAM, '1');
+    location.replace(`${url.pathname}${url.search}${url.hash}`);
   }
 
   function mergeStates(remote = {}, local = {}) {
@@ -227,10 +245,13 @@
       }
       if (durableJson(canonicalState) !== durableJson(localState)) {
         originalSetItem.call(localStorage, KEY, canonicalRaw);
-        location.reload();
-        return;
+        if (!hydrationMarked()) {
+          reloadAfterHydration();
+          return;
+        }
       }
     }
+    clearHydrationMark();
 
     const style = document.createElement('style');
     style.textContent = `
