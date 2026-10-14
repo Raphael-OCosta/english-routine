@@ -193,12 +193,20 @@
     }
     user = session.user;
 
-    const { data: profile, error: profileError } = await client
-      .from('profiles')
-      .select('full_name,role,subscription_status')
-      .single();
+    let profile;
+    try {
+      const profileResponse = await fetch('/api/profile');
+      const profileResult = await profileResponse.json();
+      if (!profileResponse.ok || !profileResult.profile) {
+        throw new Error(profileResult.error || 'Não foi possível carregar o perfil.');
+      }
+      profile = profileResult.profile;
+    } catch (profileError) {
+      location.href = '/dashboard.html';
+      return;
+    }
     const active = profile?.role === 'admin' || ['active', 'trialing'].includes(profile?.subscription_status);
-    if (profileError || !active) {
+    if (!active) {
       location.href = '/dashboard.html';
       return;
     }
