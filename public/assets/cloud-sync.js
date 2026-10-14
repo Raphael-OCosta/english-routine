@@ -9,6 +9,7 @@
   let timer;
   let syncStatus;
   let lastQueuedValue = null;
+  let syncAfterGuard = false;
   const nativeFetch = window.fetch.bind(window);
   const originalSetItem = Storage.prototype.setItem;
   const originalRemoveItem = Storage.prototype.removeItem;
@@ -184,6 +185,7 @@
     const skipHydrationOnce = sessionStorage.getItem(RELOAD_GUARD_KEY) === user.id;
     if (skipHydrationOnce) {
       sessionStorage.removeItem(RELOAD_GUARD_KEY);
+      syncAfterGuard = Boolean(localStorage.getItem(KEY));
     } else {
       const localRaw = localStorage.getItem(KEY);
       const hasPendingLocal = Boolean(localStorage.getItem(PENDING_KEY));
@@ -268,7 +270,7 @@
 
     ready = true;
     document.documentElement.dataset.cloudAuth = 'ready';
-    if (localStorage.getItem(PENDING_KEY)) flushToCloud();
+    if (localStorage.getItem(PENDING_KEY) || syncAfterGuard) flushToCloud();
   });
 })();
 
