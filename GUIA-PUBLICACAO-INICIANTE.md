@@ -875,48 +875,22 @@ CEP: qualquer CEP aceito pelo formulário
 
 Se **Assinar agora** não aparecer, confirme que você não está usando o administrador e que o aluno ainda está `inactive`. Se o botão exibir uma mensagem de erro, copie somente a mensagem; nunca envie chaves `sk_`, `whsec_` ou dados de cartão real.
 
-### 8.1 Criar a conta de demonstração do vendedor
+### 8.1 Cortesia para demonstrações e usuários brinde
 
-Crie esta conta **somente depois que todos os testes da Fase 8 passarem** e antes de conectar o domínio na Fase 9. Não reaproveite a conta administrativa nem a conta usada nos testes de pagamento.
+O procedimento manual que alterava `subscription_status` no SQL não é mais utilizado. A migração `supabase/migrations/004_complimentary_grants.sql` já foi aplicada em produção em 14/10/2026, e toda cortesia deve ser administrada pelo painel.
 
-1. Defina um e-mail exclusivo para a demonstração, por exemplo `demonstracao@englishroutine.com.br` depois que o domínio e o e-mail estiverem configurados. Enquanto isso, pode usar um endereço controlado por Raphael.
-2. Em **Supabase → Authentication → Users**, clique em **Add user → Create new user**.
-3. Informe o e-mail de demonstração e uma senha forte e exclusiva. Marque o e-mail como confirmado somente se a conta for criada manualmente pelo administrador.
-4. Abra o **SQL Editor** e execute, substituindo apenas o e-mail:
+1. Entre como administrador e abra **Minha conta → Painel administrativo**.
+2. Em **Acessos de cortesia**, informe o e-mail da pessoa.
+3. Informe uma validade, se desejar. Deixe o campo vazio para uma cortesia sem prazo.
+4. Na observação, identifique a finalidade, por exemplo `Demonstrações — vendedor João` ou `Brinde — parceiro`.
+5. Clique em **Conceder**.
+6. A pessoa entra ou cria a conta em `/login.html` usando exatamente o mesmo e-mail.
+7. Confirme no dashboard que aparece **Cortesia** e que **Começar treino** está liberado sem Checkout Stripe.
+8. Quando o acesso não for mais necessário, volte ao painel e clique em **Revogar**. O histórico salvo na nuvem é preservado.
 
-```sql
-update public.profiles
-set
-  full_name = 'Demonstração English Routine',
-  role = 'student',
-  subscription_status = 'active'
-where lower(email) = lower('demonstracao@englishroutine.com.br');
-```
+Para demonstrações comerciais, use um e-mail individual para cada vendedor, mantenha `role = student`, não cadastre cartão e nunca compartilhe a conta administrativa. O pagamento deve ser demonstrado separadamente no ambiente sandbox com uma conta de teste controlada.
 
-5. Confirme em **Table Editor → profiles** que a conta ficou com `role = student` e `subscription_status = active`.
-6. Entre em uma janela anônima, confira o nome exibido e teste o acesso ao treinamento.
-7. Prepare um pequeno roteiro de demonstração: dashboard, exercício, Reading, Speaking e Meu progresso.
-
-Regras para esse acesso:
-
-- nunca usar `role = admin`;
-- não cadastrar cartão nem assinatura Stripe;
-- não compartilhar a senha da conta administrativa;
-- trocar a senha quando o vendedor sair ou quando houver suspeita de compartilhamento;
-- se houver mais de um vendedor, criar uma conta individual para cada um;
-- antes de uma apresentação importante, usar **Meu progresso → Reiniciar progresso** para deixar a demonstração limpa.
-
-Como essa conta não possui cliente Stripe, o botão de gerenciamento de cobrança não faz parte do roteiro da demonstração. O pagamento deve ser demonstrado separadamente no ambiente sandbox, usando uma conta de teste controlada.
-
----
-
-### 8.2 Conceder acesso de cortesia (usuário brinde)
-
-1. Execute no Supabase a migração `supabase/migrations/004_complimentary_grants.sql` (já aplicada em produção em 14/10/2026).
-2. Entre como administrador e abra **Minha conta → Painel administrativo**.
-3. Em **Acessos de cortesia**, informe o e-mail, a validade opcional (vazio = sem prazo) e uma observação; clique em **Conceder**.
-4. A pessoa entra ou cria conta em `/login.html` com o mesmo e-mail. O dashboard mostra **Cortesia** e libera o treino, sem passar pelo Stripe.
-5. Para encerrar, clique em **Revogar**. O histórico salvo na nuvem é preservado.
+Antes de uma apresentação importante, entre na conta de demonstração e confira dashboard, exercícios, Reading, Speaking e Meu progresso. Só reinicie o progresso depois de gerar um backup, se o histórico anterior ainda for necessário.
 
 ## Fase 9 — conectar o domínio
 
