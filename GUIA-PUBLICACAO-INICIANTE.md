@@ -828,13 +828,23 @@ Crie uma segunda conta de aluno usando outro e-mail. Faça o fluxo completo:
 6. Acesso ao treino.
 7. Responder algumas questões.
 8. Sair e entrar novamente.
-9. Abrir em outro navegador e verificar o progresso.
+9. Esperar a barra superior mostrar **Salvo na nuvem**, abrir outro navegador, entrar com a mesma conta e verificar o progresso.
 10. Testar Speaking e conferir o limite diário.
 11. Abrir o portal do cliente.
 12. Cancelar a assinatura.
 13. Confirmar a atualização do status.
 
 Não avance se algum item falhar.
+
+Para testar o item 9 corretamente:
+
+1. No primeiro navegador, responda pelo menos duas questões.
+2. Espere a barra superior mudar de **Salvando…** para **Salvo na nuvem** antes de fechar ou trocar de navegador.
+3. No segundo navegador, entre com exatamente o mesmo e-mail do aluno.
+4. Abra **Começar treino → Meu progresso** e confira os totais.
+5. Se o segundo navegador já estava aberto antes das respostas, pressione `Ctrl + F5` ou feche e abra novamente a página de treino.
+
+O sistema consulta o snapshot do Supabase em cada abertura. Dados locais só prevalecem quando existe uma alteração explicitamente marcada como pendente; sem pendência, a versão da nuvem é a fonte usada no novo navegador.
 
 ### 8.0.1 Como fazer a compra com cartão de teste
 
