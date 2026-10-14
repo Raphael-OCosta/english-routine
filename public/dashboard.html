@@ -1,2 +1,46 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Minha conta · English Routine</title><link rel="stylesheet" href="/assets/site.css"><style>[hidden]{display:none!important}</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/config.js"></script></head><body><div class="accountbar"><a class="brand" style="color:white" href="/">english<span>routine.</span></a><button id="logout">Sair</button></div><main class="wrap dashboard"><div class="eyebrow">Minha conta</div><h2>Olá, <span id="studentName">aluno</span>.</h2><div class="dashboard-grid"><section class="card"><h3>Seu treino</h3><p id="accessMessage">Verificando sua assinatura…</p><a id="study" class="button" href="/app.html" hidden>Começar treino</a><button id="subscribe" hidden>Assinar agora</button></section><aside class="card"><h3>Assinatura</h3><p><span id="subscription" class="badge">Verificando</span></p><button id="portal" class="button secondary" hidden>Gerenciar cobrança</button><a id="admin" href="/admin.html" hidden>Painel administrativo</a></aside></div></main><script src="/assets/dashboard.js"></script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Minha conta · English Routine</title>
+  <link rel="stylesheet" href="/assets/site.css">
+  <style>[hidden]{display:none!important}.history-box{margin-top:20px}.history-box textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit;resize:vertical}.history-box input{margin:10px 0}.history-box .status{color:var(--muted)}</style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/config.js"></script>
+</head>
+<body>
+  <div class="accountbar"><a class="brand" style="color:white" href="/">english<span>routine.</span></a><button id="logout">Sair</button></div>
+  <main class="wrap dashboard">
+    <div class="eyebrow">Minha conta</div>
+    <h2>Olá, <span id="studentName">aluno</span>.</h2>
+    <div class="dashboard-grid">
+      <section class="card">
+        <h3>Seu treino</h3>
+        <p id="accessMessage">Verificando sua assinatura…</p>
+        <a id="study" class="button" href="/app.html" hidden>Começar treino</a>
+        <button id="subscribe" hidden>Assinar agora</button>
+      </section>
+      <aside class="card">
+        <h3>Assinatura</h3>
+        <p><span id="subscription" class="badge">Verificando</span></p>
+        <button id="portal" class="button secondary" hidden>Gerenciar cobrança</button>
+        <a id="admin" href="/admin.html" hidden>Painel administrativo</a>
+      </aside>
+    </div>
+    <section class="card history-box">
+      <div class="eyebrow">Recuperação</div>
+      <h3>Importar histórico antigo</h3>
+      <p>Selecione o arquivo JSON exportado na versão local ou cole o conteúdo do backup. A importação grava o histórico na sua conta e não altera seu login.</p>
+      <label for="historyFile"><b>Arquivo de backup</b></label><br>
+      <input id="historyFile" type="file" accept=".json,application/json">
+      <label for="historyPaste"><b>Ou cole o backup</b></label>
+      <textarea id="historyPaste" placeholder="Cole aqui o conteúdo completo do backup JSON"></textarea>
+      <button id="importHistory">Importar histórico</button>
+      <p id="historyStatus" class="status" role="status"></p>
+    </section>
+  </main>
+  <script src="/assets/dashboard.js"></script>
+</body>
+</html>
 
