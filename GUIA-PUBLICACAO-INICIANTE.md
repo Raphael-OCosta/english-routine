@@ -828,7 +828,7 @@ Crie uma segunda conta de aluno usando outro e-mail. Faça o fluxo completo:
 6. Acesso ao treino.
 7. Responder algumas questões.
 8. Sair e entrar novamente.
-9. Esperar a barra superior mostrar **Salvo na nuvem**, abrir outro navegador, entrar com a mesma conta e verificar o progresso.
+9. Esperar a barra superior mostrar **Salvo na nuvem · N respostas**, abrir outro navegador, entrar com a mesma conta e verificar o mesmo total.
 10. Testar Speaking e conferir o limite diário.
 11. Abrir o portal do cliente.
 12. Cancelar a assinatura.
@@ -839,12 +839,13 @@ Não avance se algum item falhar.
 Para testar o item 9 corretamente:
 
 1. No primeiro navegador, responda pelo menos duas questões.
-2. Espere a barra superior mudar de **Salvando…** para **Salvo na nuvem** antes de fechar ou trocar de navegador.
+2. Espere a barra superior mudar de **Salvando…** para **Salvo na nuvem · N respostas** antes de fechar ou trocar de navegador.
 3. No segundo navegador, entre com exatamente o mesmo e-mail do aluno.
-4. Abra **Começar treino → Meu progresso** e confira os totais.
-5. Se o segundo navegador já estava aberto antes das respostas, pressione `Ctrl + F5` ou feche e abra novamente a página de treino.
+4. No dashboard, confira o e-mail exibido e a linha **N respostas salvas na nuvem**.
+5. Abra **Começar treino → Meu progresso** e confira os mesmos totais.
+6. Se o segundo navegador já estava aberto antes das respostas, pressione `Ctrl + F5` ou feche e abra novamente a página de treino.
 
-O sistema consulta o snapshot do Supabase em cada abertura. Dados locais só prevalecem quando existe uma alteração explicitamente marcada como pendente; sem pendência, a versão da nuvem é a fonte usada no novo navegador.
+O sistema consulta o snapshot do Supabase em cada abertura e combina as respostas locais e online sem descartar nenhuma das duas origens. A gravação é detectada pelo evento do treino, pela escrita no armazenamento do navegador e por uma verificação periódica de segurança.
 
 Se a página de treino ficar recarregando continuamente, feche a aba e confirme que a implantação contém a correção de hidratação. O Supabase pode reorganizar as chaves de um JSON sem alterar seu conteúdo; a versão corrigida faz comparação estrutural, evitando interpretar apenas essa mudança de ordem como progresso diferente.
 

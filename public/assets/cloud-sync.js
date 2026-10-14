@@ -7,8 +7,10 @@
   let user;
   let ready = false;
   let timer;
+  let observerTimer;
   let syncStatus;
   let lastQueuedValue = null;
+  let lastObservedValue = null;
   const nativeFetch = window.fetch.bind(window);
   const originalSetItem = Storage.prototype.setItem;
   const originalRemoveItem = Storage.prototype.removeItem;
@@ -28,6 +30,21 @@
     if (!syncStatus) return;
     syncStatus.textContent = message;
     syncStatus.dataset.state = state;
+  }
+
+  function savedMessage(state) {
+    const attempts = Array.isArray(state?.attempts) ? state.attempts.length : 0;
+    return `Salvo na nuvem · ${attempts} ${attempts === 1 ? 'resposta' : 'respostas'}`;
+  }
+
+  function parseState(raw) {
+    if (!raw) return null;
+    try {
+      const state = JSON.parse(raw);
+      return state && typeof state === 'object' && Array.isArray(state.attempts) ? state : null;
+    } catch (error) {
+      return null;
+    }
   }
 
   function stableJson(value) {
@@ -117,7 +134,7 @@
   }
 
   async function remoteState() {
-    const response = await fetch('/api/progress');
+    const response = await fetch('/api/progress', { cache: 'no-store' });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Não foi possível carregar o progresso.');
     return result.state || null;
@@ -139,13 +156,17 @@
     clearTimeout(timer);
     showSync('Salvando…', 'saving');
     try {
-      const localState = JSON.parse(raw);
+      const latestRaw = localStorage.getItem(KEY) || raw;
+      const localState = parseState(latestRaw);
+      if (!localState) throw new Error('O progresso local não pôde ser lido.');
       const state = mergeStates(await remoteState() || {}, localState);
       const savedState = await saveRemoteState(state);
-      originalSetItem.call(localStorage, KEY, JSON.stringify(savedState));
+      const savedRaw = JSON.stringify(savedState);
+      originalSetItem.call(localStorage, KEY, savedRaw);
+      lastObservedValue = savedRaw;
       lastQueuedValue = null;
       originalRemoveItem.call(localStorage, PENDING_KEY);
-      showSync('Salvo na nuvem', 'saved');
+      showSync(savedMessage(savedState), 'saved');
       return true;
     } catch (error) {
       originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
@@ -155,6 +176,7 @@
   }
 
   function queueSync(raw) {
+    if (!raw) return;
     lastQueuedValue = raw;
     originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
     showSync('Alterações pendentes', 'pending');
@@ -164,8 +186,18 @@
 
   Storage.prototype.setItem = function setItem(key, value) {
     originalSetItem.call(this, key, value);
-    if (this === localStorage && key === KEY && ready) queueSync(value);
+    if (this === localStorage && key === KEY) {
+      lastObservedValue = value;
+      if (ready) queueSync(value);
+    }
   };
+
+  addEventListener('english-daily:state-saved', event => {
+    const raw = event.detail?.raw || localStorage.getItem(KEY);
+    if (!raw) return;
+    lastObservedValue = raw;
+    if (ready) queueSync(raw);
+  });
 
   addEventListener('online', () => flushToCloud());
   addEventListener('visibilitychange', () => {
@@ -221,25 +253,18 @@
       return;
     }
 
+    const localState = parseState(localRaw);
     let canonicalState = null;
-    if (hasPendingLocal && localRaw) {
-      canonicalState = mergeStates(cloudState || {}, JSON.parse(localRaw));
-      let uploaded = false;
-      try {
-        canonicalState = await saveRemoteState(canonicalState);
-        uploaded = true;
-      } catch (uploadError) {
-        originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
-      }
-      if (uploaded) originalRemoveItem.call(localStorage, PENDING_KEY);
-    } else if (cloudState && Object.keys(cloudState).length) {
-      canonicalState = cloudState;
-    } else if (localRaw) {
-      canonicalState = JSON.parse(localRaw);
-      try {
-        canonicalState = await saveRemoteState(canonicalState);
-      } catch (uploadError) {
-        originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
+    if (cloudState || localState) {
+      canonicalState = mergeStates(cloudState || {}, localState || {});
+      const cloudChanged = durableJson(canonicalState) !== durableJson(cloudState);
+      if (cloudChanged || hasPendingLocal) {
+        try {
+          canonicalState = await saveRemoteState(canonicalState);
+          originalRemoveItem.call(localStorage, PENDING_KEY);
+        } catch (uploadError) {
+          originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
+        }
       }
     }
 
@@ -253,6 +278,7 @@
       }
       if (durableJson(canonicalState) !== durableJson(localState)) {
         originalSetItem.call(localStorage, KEY, canonicalRaw);
+        lastObservedValue = canonicalRaw;
         if (!hydrationMarked()) {
           reloadAfterHydration();
           return;
@@ -266,7 +292,9 @@
       .cloud-accountbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px max(22px,calc((100vw - 1320px)/2));background:var(--card);color:var(--ink);border-bottom:1px solid var(--line);box-shadow:0 4px 18px rgba(1,52,115,.06)}
       .cloud-accountbar__user{display:flex;align-items:center;gap:9px;min-width:0}
       .cloud-accountbar__avatar{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;font-weight:800}
+      .cloud-accountbar__identity{display:grid;line-height:1.25;min-width:0}
       .cloud-accountbar__name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .cloud-accountbar__email{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       .cloud-accountbar__actions{display:flex;align-items:center;justify-content:flex-end;gap:12px}
       .cloud-accountbar__status{font-size:12px;color:var(--muted);white-space:nowrap}
       .cloud-accountbar__status[data-state="error"]{color:var(--bad)}
@@ -281,7 +309,10 @@
     bar.innerHTML = `
       <div class="cloud-accountbar__user">
         <span class="cloud-accountbar__avatar" aria-hidden="true"></span>
-        <span class="cloud-accountbar__name">Olá, <b></b></span>
+        <span class="cloud-accountbar__identity">
+          <span class="cloud-accountbar__name">Olá, <b></b></span>
+          <span class="cloud-accountbar__email"></span>
+        </span>
       </div>
       <div class="cloud-accountbar__actions">
         <span class="cloud-accountbar__status" role="status">Sincronizado</span>
@@ -289,13 +320,25 @@
       </div>`;
     const name = profile.full_name || user.email.split('@')[0];
     bar.querySelector('b').textContent = name;
+    bar.querySelector('.cloud-accountbar__email').textContent = user.email;
     bar.querySelector('.cloud-accountbar__avatar').textContent = name.trim().charAt(0).toUpperCase();
     syncStatus = bar.querySelector('.cloud-accountbar__status');
     document.body.prepend(bar);
 
     ready = true;
     document.documentElement.dataset.cloudAuth = 'ready';
+    lastObservedValue = localStorage.getItem(KEY);
+    clearInterval(observerTimer);
+    observerTimer = setInterval(() => {
+      if (!ready) return;
+      const current = localStorage.getItem(KEY);
+      if (current && current !== lastObservedValue) {
+        lastObservedValue = current;
+        queueSync(current);
+      }
+    }, 1000);
     if (localStorage.getItem(PENDING_KEY)) flushToCloud();
+    else showSync(savedMessage(canonicalState || parseState(lastObservedValue) || {}), 'saved');
   });
 })();
 

@@ -1,0 +1,11 @@
+/app.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/dashboard.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/assets/cloud-sync.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/assets/dashboard.js
+  Cache-Control: no-cache, no-store, must-revalidate

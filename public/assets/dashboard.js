@@ -149,6 +149,7 @@
   }
 
   document.querySelector('#studentName').textContent = profile.full_name || session.user.email.split('@')[0];
+  document.querySelector('#accountEmail').textContent = session.user.email;
   const active = ['active', 'trialing'].includes(profile.subscription_status) || profile.role === 'admin';
   document.querySelector('#subscription').textContent = profile.role === 'admin' ? 'Administrador' : active ? 'Ativa' : 'Inativa';
   document.querySelector('#accessMessage').textContent = active
@@ -158,6 +159,20 @@
   document.querySelector('#subscribe').hidden = active;
   document.querySelector('#portal').hidden = !profile.stripe_customer_id;
   document.querySelector('#admin').hidden = profile.role !== 'admin';
+
+  try {
+    const progressResponse = await fetch('/api/progress', {
+      cache: 'no-store',
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    const progressResult = await progressResponse.json();
+    if (!progressResponse.ok) throw new Error(progressResult.error || 'Não foi possível consultar o progresso.');
+    const attempts = Array.isArray(progressResult.state?.attempts) ? progressResult.state.attempts.length : 0;
+    const skills = Array.isArray(progressResult.state?.skills?.events) ? progressResult.state.skills.events.length : 0;
+    document.querySelector('#cloudProgress').textContent = `${attempts} ${attempts === 1 ? 'resposta salva' : 'respostas salvas'} na nuvem${skills ? ` · ${skills} treinos de habilidades` : ''}.`;
+  } catch (error) {
+    document.querySelector('#cloudProgress').textContent = `Não foi possível conferir o progresso salvo: ${error.message}`;
+  }
 
   async function call(path, button, loadingMessage) {
     const originalLabel = button.textContent;

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Minha conta · English Routine</title>
   <link rel="stylesheet" href="/assets/site.css">
-  <style>[hidden]{display:none!important}.history-box{margin-top:20px}.history-box textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit;resize:vertical}.history-box input{margin:10px 0}.history-box .status{color:var(--muted)}</style>
+  <style>[hidden]{display:none!important}.history-box{margin-top:20px}.history-box textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit;resize:vertical}.history-box input{margin:10px 0}.history-box .status,.account-email,.cloud-progress{color:var(--muted)}.account-email{margin-top:-18px}.cloud-progress{font-weight:700}</style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/config.js"></script>
 </head>
@@ -14,10 +14,12 @@
   <main class="wrap dashboard">
     <div class="eyebrow">Minha conta</div>
     <h2>Olá, <span id="studentName">aluno</span>.</h2>
+    <p id="accountEmail" class="account-email"></p>
     <div class="dashboard-grid">
       <section class="card">
         <h3>Seu treino</h3>
         <p id="accessMessage">Verificando sua assinatura…</p>
+        <p id="cloudProgress" class="cloud-progress">Consultando o progresso salvo…</p>
         <a id="study" class="button" href="/app.html" hidden>Começar treino</a>
         <button id="subscribe" hidden>Assinar agora</button>
       </section>
@@ -40,7 +42,7 @@
       <p id="historyStatus" class="status" role="status"></p>
     </section>
   </main>
-  <script src="/assets/dashboard.js"></script>
+  <script src="/assets/dashboard.js?v=20261014-2"></script>
 </body>
 </html>
 

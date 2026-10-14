@@ -1,6 +1,9 @@
 export const json = (data, status = 200) => new Response(JSON.stringify(data), {
   status,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    'Cache-Control': 'private, no-store',
+  },
 });
 
 export async function userFromRequest(request, env) {
