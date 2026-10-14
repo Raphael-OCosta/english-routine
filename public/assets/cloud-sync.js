@@ -2,14 +2,12 @@
   window.ENGLISH_DAILY_CLOUD = true;
   const KEY = 'english-daily-v1';
   const PENDING_KEY = `${KEY}-cloud-pending`;
-  const RELOAD_GUARD_KEY = `${KEY}-cloud-reload-once`;
   let client;
   let user;
   let ready = false;
   let timer;
   let syncStatus;
   let lastQueuedValue = null;
-  let syncAfterGuard = false;
   const nativeFetch = window.fetch.bind(window);
   const originalSetItem = Storage.prototype.setItem;
   const originalRemoveItem = Storage.prototype.removeItem;
@@ -37,6 +35,11 @@
       return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${stableJson(value[key])}`).join(',')}}`;
     }
     return JSON.stringify(value);
+  }
+
+  function durableJson(value) {
+    if (!value || typeof value !== 'object') return stableJson(value);
+    return stableJson({ ...value, session: null });
   }
 
   function mergeStates(remote = {}, local = {}) {
@@ -182,57 +185,50 @@
       return;
     }
 
-    const skipHydrationOnce = sessionStorage.getItem(RELOAD_GUARD_KEY) === user.id;
-    if (skipHydrationOnce) {
-      sessionStorage.removeItem(RELOAD_GUARD_KEY);
-      syncAfterGuard = Boolean(localStorage.getItem(KEY));
-    } else {
-      const localRaw = localStorage.getItem(KEY);
-      const hasPendingLocal = Boolean(localStorage.getItem(PENDING_KEY));
-      let cloudState;
+    const localRaw = localStorage.getItem(KEY);
+    const hasPendingLocal = Boolean(localStorage.getItem(PENDING_KEY));
+    let cloudState;
+    try {
+      cloudState = await remoteState();
+    } catch (error) {
+      location.href = '/dashboard.html';
+      return;
+    }
+
+    let canonicalState = null;
+    if (hasPendingLocal && localRaw) {
+      canonicalState = mergeStates(cloudState || {}, JSON.parse(localRaw));
+      let uploaded = false;
       try {
-        cloudState = await remoteState();
+        canonicalState = await saveRemoteState(canonicalState);
+        uploaded = true;
+      } catch (uploadError) {
+        originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
+      }
+      if (uploaded) originalRemoveItem.call(localStorage, PENDING_KEY);
+    } else if (cloudState && Object.keys(cloudState).length) {
+      canonicalState = cloudState;
+    } else if (localRaw) {
+      canonicalState = JSON.parse(localRaw);
+      try {
+        canonicalState = await saveRemoteState(canonicalState);
+      } catch (uploadError) {
+        originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
+      }
+    }
+
+    if (canonicalState) {
+      const canonicalRaw = JSON.stringify(canonicalState);
+      let localState = null;
+      try {
+        localState = localRaw ? JSON.parse(localRaw) : null;
       } catch (error) {
-        location.href = '/dashboard.html';
+        localState = null;
+      }
+      if (durableJson(canonicalState) !== durableJson(localState)) {
+        originalSetItem.call(localStorage, KEY, canonicalRaw);
+        location.reload();
         return;
-      }
-
-      let canonicalState = null;
-      if (hasPendingLocal && localRaw) {
-        canonicalState = mergeStates(cloudState || {}, JSON.parse(localRaw));
-        let uploaded = false;
-        try {
-          canonicalState = await saveRemoteState(canonicalState);
-          uploaded = true;
-        } catch (uploadError) {
-          originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
-        }
-        if (uploaded) originalRemoveItem.call(localStorage, PENDING_KEY);
-      } else if (cloudState && Object.keys(cloudState).length) {
-        canonicalState = cloudState;
-      } else if (localRaw) {
-        canonicalState = JSON.parse(localRaw);
-        try {
-          canonicalState = await saveRemoteState(canonicalState);
-        } catch (uploadError) {
-          originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
-        }
-      }
-
-      if (canonicalState) {
-        const canonicalRaw = JSON.stringify(canonicalState);
-        let localState = null;
-        try {
-          localState = localRaw ? JSON.parse(localRaw) : null;
-        } catch (error) {
-          localState = null;
-        }
-        if (stableJson(canonicalState) !== stableJson(localState)) {
-          originalSetItem.call(localStorage, KEY, canonicalRaw);
-          sessionStorage.setItem(RELOAD_GUARD_KEY, user.id);
-          location.reload();
-          return;
-        }
       }
     }
 
@@ -270,7 +266,7 @@
 
     ready = true;
     document.documentElement.dataset.cloudAuth = 'ready';
-    if (localStorage.getItem(PENDING_KEY) || syncAfterGuard) flushToCloud();
+    if (localStorage.getItem(PENDING_KEY)) flushToCloud();
   });
 })();
 
