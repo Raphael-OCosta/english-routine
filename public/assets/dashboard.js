@@ -112,7 +112,10 @@
       historyStatus.textContent = `Histórico combinado com sucesso: ${attempts.length} respostas disponíveis. Abra o treino para conferir.`;
       document.querySelector('#study').hidden = false;
     } catch (error) {
-      historyStatus.textContent = error.message || 'Não foi possível importar o histórico.';
+      const message = error.message || '';
+      historyStatus.textContent = message.toLowerCase().includes('permission denied')
+        ? 'O banco ainda precisa receber as permissões da migração 003. Nenhum dado foi alterado.'
+        : message || 'Não foi possível importar o histórico.';
     }
   };
 
