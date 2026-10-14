@@ -836,6 +836,39 @@ Crie uma segunda conta de aluno usando outro e-mail. Faça o fluxo completo:
 
 Não avance se algum item falhar.
 
+### 8.1 Criar a conta de demonstração do vendedor
+
+Crie esta conta **somente depois que todos os testes da Fase 8 passarem** e antes de conectar o domínio na Fase 9. Não reaproveite a conta administrativa nem a conta usada nos testes de pagamento.
+
+1. Defina um e-mail exclusivo para a demonstração, por exemplo `demonstracao@englishroutine.com.br` depois que o domínio e o e-mail estiverem configurados. Enquanto isso, pode usar um endereço controlado por Raphael.
+2. Em **Supabase → Authentication → Users**, clique em **Add user → Create new user**.
+3. Informe o e-mail de demonstração e uma senha forte e exclusiva. Marque o e-mail como confirmado somente se a conta for criada manualmente pelo administrador.
+4. Abra o **SQL Editor** e execute, substituindo apenas o e-mail:
+
+```sql
+update public.profiles
+set
+  full_name = 'Demonstração English Routine',
+  role = 'student',
+  subscription_status = 'active'
+where lower(email) = lower('demonstracao@englishroutine.com.br');
+```
+
+5. Confirme em **Table Editor → profiles** que a conta ficou com `role = student` e `subscription_status = active`.
+6. Entre em uma janela anônima, confira o nome exibido e teste o acesso ao treinamento.
+7. Prepare um pequeno roteiro de demonstração: dashboard, exercício, Reading, Speaking e Meu progresso.
+
+Regras para esse acesso:
+
+- nunca usar `role = admin`;
+- não cadastrar cartão nem assinatura Stripe;
+- não compartilhar a senha da conta administrativa;
+- trocar a senha quando o vendedor sair ou quando houver suspeita de compartilhamento;
+- se houver mais de um vendedor, criar uma conta individual para cada um;
+- antes de uma apresentação importante, usar **Meu progresso → Reiniciar progresso** para deixar a demonstração limpa.
+
+Como essa conta não possui cliente Stripe, o botão de gerenciamento de cobrança não faz parte do roteiro da demonstração. O pagamento deve ser demonstrado separadamente no ambiente sandbox, usando uma conta de teste controlada.
+
 ---
 
 ## Fase 9 — conectar o domínio
