@@ -46,14 +46,14 @@
       if (!state || typeof state !== 'object' || !Array.isArray(state.attempts)) {
         throw new Error('O arquivo não parece ser um backup válido do English Routine.');
       }
-      const { data: currentRow, error: readError } = await client
-        .from('progress_snapshots')
-        .select('state')
-        .maybeSingle();
-      if (readError) throw readError;
+      const progressResponse = await fetch('/api/progress', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const progressResult = await progressResponse.json();
+      if (!progressResponse.ok) throw new Error(progressResult.error || 'Não foi possível carregar o progresso atual.');
 
-      const current = currentRow?.state && typeof currentRow.state === 'object'
-        ? currentRow.state
+      const current = progressResult.state && typeof progressResult.state === 'object'
+        ? progressResult.state
         : {};
       const attempts = [...(Array.isArray(current.attempts) ? current.attempts : [])];
       const attemptKeys = new Set(attempts.map(item => `${item.time}|${item.qid}`));
@@ -102,12 +102,16 @@
         },
       };
 
-      const { error } = await client.from('progress_snapshots').upsert({
-        user_id: session.user.id,
-        state: merged,
-        updated_at: new Date().toISOString(),
+      const saveResponse = await fetch('/api/progress', {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ state: merged }),
       });
-      if (error) throw error;
+      const saveResult = await saveResponse.json();
+      if (!saveResponse.ok) throw new Error(saveResult.error || 'Não foi possível salvar o histórico.');
       sessionStorage.removeItem('english-daily-cloud-loaded');
       historyStatus.textContent = `Histórico combinado com sucesso: ${attempts.length} respostas disponíveis. Abra o treino para conferir.`;
       document.querySelector('#study').hidden = false;
