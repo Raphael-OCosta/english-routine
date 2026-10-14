@@ -155,16 +155,28 @@
   document.querySelector('#portal').hidden = !profile.stripe_customer_id;
   document.querySelector('#admin').hidden = profile.role !== 'admin';
 
-  async function call(path) {
-    const response = await fetch(path, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${session.access_token}` },
-    });
-    const data = await response.json();
-    if (!response.ok) throw Error(data.error || 'Não foi possível continuar.');
-    location.href = data.url;
+  async function call(path, button, loadingMessage) {
+    const originalLabel = button.textContent;
+    button.disabled = true;
+    document.querySelector('#accessMessage').textContent = loadingMessage;
+    try {
+      const response = await fetch(path, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const data = await response.json();
+      if (!response.ok) throw Error(data.error || 'Não foi possível continuar.');
+      if (!data.url) throw Error('O Stripe não devolveu o endereço de pagamento.');
+      location.href = data.url;
+    } catch (error) {
+      button.disabled = false;
+      button.textContent = originalLabel;
+      document.querySelector('#accessMessage').textContent = `Não foi possível abrir o Stripe: ${error.message}`;
+    }
   }
-  document.querySelector('#subscribe').onclick = () => call('/api/create-checkout-session');
-  document.querySelector('#portal').onclick = () => call('/api/customer-portal');
+  const subscribe = document.querySelector('#subscribe');
+  const portal = document.querySelector('#portal');
+  subscribe.onclick = () => call('/api/create-checkout-session', subscribe, 'Abrindo o pagamento seguro do Stripe…');
+  portal.onclick = () => call('/api/customer-portal', portal, 'Abrindo o portal de cobrança…');
 })();
 
