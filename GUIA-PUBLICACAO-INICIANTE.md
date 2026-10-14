@@ -823,7 +823,7 @@ Crie uma segunda conta de aluno usando outro e-mail. Faça o fluxo completo:
 1. Cadastro.
 2. Confirmação do e-mail.
 3. Login.
-4. Compra com cartão de teste indicado pelo Stripe.
+4. Compra com cartão de teste indicado pelo Stripe, conforme o procedimento detalhado abaixo.
 5. Retorno ao dashboard.
 6. Acesso ao treino.
 7. Responder algumas questões.
@@ -835,6 +835,32 @@ Crie uma segunda conta de aluno usando outro e-mail. Faça o fluxo completo:
 13. Confirmar a atualização do status.
 
 Não avance se algum item falhar.
+
+### 8.0.1 Como fazer a compra com cartão de teste
+
+Use uma conta de aluno comum criada com outro e-mail. A conta `rarphael@gmail.com` é administradora, já possui acesso liberado e não exibe **Assinar agora**.
+
+1. Abra uma janela anônima/privativa do navegador.
+2. Acesse `https://english-routine-760.pages.dev/login.html`.
+3. Entre com a segunda conta de aluno, cujo perfil deve ter `role = student` e `subscription_status = inactive`.
+4. No dashboard, confirme que aparece **Assinatura: Inativa** e clique em **Assinar agora**.
+5. Aguarde a página hospedada do Stripe abrir. Ela precisa indicar que está no ambiente de teste/sandbox.
+6. Preencha o formulário com dados de teste:
+
+```text
+Número do cartão: 4242 4242 4242 4242
+Validade: 12/34
+CVC: 123
+Nome: Aluno Teste
+CEP: qualquer CEP aceito pelo formulário
+```
+
+7. Conclua o pagamento. Não use cartão real.
+8. Aguarde o retorno automático ao dashboard.
+9. Recarregue uma vez se o status ainda estiver como inativo; o webhook pode levar alguns segundos.
+10. Confirme **Assinatura: Ativa** e o botão **Começar treino**.
+
+Se **Assinar agora** não aparecer, confirme que você não está usando o administrador e que o aluno ainda está `inactive`. Se o botão exibir uma mensagem de erro, copie somente a mensagem; nunca envie chaves `sk_`, `whsec_` ou dados de cartão real.
 
 ### 8.1 Criar a conta de demonstração do vendedor
 
