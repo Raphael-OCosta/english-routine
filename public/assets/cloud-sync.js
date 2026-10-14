@@ -94,25 +94,33 @@
     };
   }
 
+  async function remoteState() {
+    const response = await fetch('/api/progress');
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Não foi possível carregar o progresso.');
+    return result.state || null;
+  }
+
+  async function saveRemoteState(state) {
+    const response = await fetch('/api/progress', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ state }),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Não foi possível salvar o progresso.');
+    return result.state || state;
+  }
+
   async function flushToCloud(raw = lastQueuedValue || localStorage.getItem(KEY)) {
     if (!ready || !raw || !user) return false;
     clearTimeout(timer);
     showSync('Salvando…', 'saving');
     try {
       const localState = JSON.parse(raw);
-      const { data: remoteRow, error: readError } = await client
-        .from('progress_snapshots')
-        .select('state')
-        .maybeSingle();
-      if (readError) throw readError;
-      const state = mergeStates(remoteRow?.state || {}, localState);
-      const { error } = await client.from('progress_snapshots').upsert({
-        user_id: user.id,
-        state,
-        updated_at: new Date().toISOString(),
-      });
-      if (error) throw error;
-      originalSetItem.call(localStorage, KEY, JSON.stringify(state));
+      const state = mergeStates(await remoteState() || {}, localState);
+      const savedState = await saveRemoteState(state);
+      originalSetItem.call(localStorage, KEY, JSON.stringify(savedState));
       lastQueuedValue = null;
       originalRemoveItem.call(localStorage, PENDING_KEY);
       showSync('Salvo na nuvem', 'saved');
@@ -179,35 +187,34 @@
     } else {
       const localRaw = localStorage.getItem(KEY);
       const hasPendingLocal = Boolean(localStorage.getItem(PENDING_KEY));
-      const { data, error } = await client.from('progress_snapshots').select('state').maybeSingle();
-      if (error) {
+      let cloudState;
+      try {
+        cloudState = await remoteState();
+      } catch (error) {
         location.href = '/dashboard.html';
         return;
       }
 
       let canonicalState = null;
       if (hasPendingLocal && localRaw) {
-        canonicalState = mergeStates(data?.state || {}, JSON.parse(localRaw));
-        const { error: uploadError } = await client.from('progress_snapshots').upsert({
-          user_id: user.id,
-          state: canonicalState,
-          updated_at: new Date().toISOString(),
-        });
-        if (uploadError) {
+        canonicalState = mergeStates(cloudState || {}, JSON.parse(localRaw));
+        let uploaded = false;
+        try {
+          canonicalState = await saveRemoteState(canonicalState);
+          uploaded = true;
+        } catch (uploadError) {
           originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
-        } else {
-          originalRemoveItem.call(localStorage, PENDING_KEY);
         }
-      } else if (data?.state && Object.keys(data.state).length) {
-        canonicalState = data.state;
+        if (uploaded) originalRemoveItem.call(localStorage, PENDING_KEY);
+      } else if (cloudState && Object.keys(cloudState).length) {
+        canonicalState = cloudState;
       } else if (localRaw) {
         canonicalState = JSON.parse(localRaw);
-        const { error: uploadError } = await client.from('progress_snapshots').upsert({
-          user_id: user.id,
-          state: canonicalState,
-          updated_at: new Date().toISOString(),
-        });
-        if (uploadError) originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
+        try {
+          canonicalState = await saveRemoteState(canonicalState);
+        } catch (uploadError) {
+          originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
+        }
       }
 
       if (canonicalState) {
