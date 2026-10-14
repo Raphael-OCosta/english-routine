@@ -29,6 +29,14 @@
     syncStatus.dataset.state = state;
   }
 
+  function stableJson(value) {
+    if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+    if (value && typeof value === 'object') {
+      return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${stableJson(value[key])}`).join(',')}}`;
+    }
+    return JSON.stringify(value);
+  }
+
   function mergeStates(remote = {}, local = {}) {
     const attempts = [...(Array.isArray(remote.attempts) ? remote.attempts : [])];
     const attemptKeys = new Set(attempts.map(item => `${item.time}|${item.qid}`));
@@ -199,7 +207,13 @@
 
     if (canonicalState) {
       const canonicalRaw = JSON.stringify(canonicalState);
-      if (canonicalRaw !== localRaw) {
+      let localState = null;
+      try {
+        localState = localRaw ? JSON.parse(localRaw) : null;
+      } catch (error) {
+        localState = null;
+      }
+      if (stableJson(canonicalState) !== stableJson(localState)) {
         originalSetItem.call(localStorage, KEY, canonicalRaw);
         location.reload();
         return;
