@@ -120,7 +120,7 @@
     originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
     showSync('Alterações pendentes', 'pending');
     clearTimeout(timer);
-    timer = setTimeout(() => flushToCloud(raw), 600);
+    timer = setTimeout(() => flushToCloud(raw), 250);
   }
 
   Storage.prototype.setItem = function setItem(key, value) {
@@ -130,7 +130,7 @@
 
   addEventListener('online', () => flushToCloud());
   addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && localStorage.getItem(PENDING_KEY)) flushToCloud();
+    if (localStorage.getItem(PENDING_KEY)) flushToCloud();
   });
 
   addEventListener('DOMContentLoaded', async () => {
@@ -164,40 +164,46 @@
       return;
     }
 
-    const migration = sessionStorage.getItem('english-daily-cloud-loaded');
-    if (!migration) {
-      const localRaw = localStorage.getItem(KEY);
-      const hasPendingLocal = Boolean(localStorage.getItem(PENDING_KEY));
-      const { data, error } = await client.from('progress_snapshots').select('state').maybeSingle();
-      if (error) {
-        location.href = '/dashboard.html';
+    const localRaw = localStorage.getItem(KEY);
+    const hasPendingLocal = Boolean(localStorage.getItem(PENDING_KEY));
+    const { data, error } = await client.from('progress_snapshots').select('state').maybeSingle();
+    if (error) {
+      location.href = '/dashboard.html';
+      return;
+    }
+
+    let canonicalState = null;
+    if (hasPendingLocal && localRaw) {
+      canonicalState = mergeStates(data?.state || {}, JSON.parse(localRaw));
+      const { error: uploadError } = await client.from('progress_snapshots').upsert({
+        user_id: user.id,
+        state: canonicalState,
+        updated_at: new Date().toISOString(),
+      });
+      if (uploadError) {
+        originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
+      } else {
+        originalRemoveItem.call(localStorage, PENDING_KEY);
+      }
+    } else if (data?.state && Object.keys(data.state).length) {
+      canonicalState = data.state;
+    } else if (localRaw) {
+      canonicalState = JSON.parse(localRaw);
+      const { error: uploadError } = await client.from('progress_snapshots').upsert({
+        user_id: user.id,
+        state: canonicalState,
+        updated_at: new Date().toISOString(),
+      });
+      if (uploadError) originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
+    }
+
+    if (canonicalState) {
+      const canonicalRaw = JSON.stringify(canonicalState);
+      if (canonicalRaw !== localRaw) {
+        originalSetItem.call(localStorage, KEY, canonicalRaw);
+        location.reload();
         return;
       }
-
-      if (hasPendingLocal && localRaw) {
-        const merged = mergeStates(data?.state || {}, JSON.parse(localRaw));
-        const { error: uploadError } = await client.from('progress_snapshots').upsert({
-          user_id: user.id,
-          state: merged,
-          updated_at: new Date().toISOString(),
-        });
-        if (!uploadError) {
-          originalSetItem.call(localStorage, KEY, JSON.stringify(merged));
-          originalRemoveItem.call(localStorage, PENDING_KEY);
-        }
-      } else if (data?.state && Object.keys(data.state).length) {
-        originalSetItem.call(localStorage, KEY, JSON.stringify(data.state));
-      } else if (localRaw) {
-        const { error: uploadError } = await client.from('progress_snapshots').upsert({
-          user_id: user.id,
-          state: JSON.parse(localRaw),
-          updated_at: new Date().toISOString(),
-        });
-        if (uploadError) originalSetItem.call(localStorage, PENDING_KEY, new Date().toISOString());
-      }
-      sessionStorage.setItem('english-daily-cloud-loaded', '1');
-      location.reload();
-      return;
     }
 
     const style = document.createElement('style');
