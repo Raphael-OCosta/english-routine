@@ -846,6 +846,8 @@ Para testar o item 9 corretamente:
 
 O sistema consulta o snapshot do Supabase em cada abertura. Dados locais só prevalecem quando existe uma alteração explicitamente marcada como pendente; sem pendência, a versão da nuvem é a fonte usada no novo navegador.
 
+Se a página de treino ficar recarregando continuamente, feche a aba e confirme que a implantação contém a correção de hidratação. O Supabase pode reorganizar as chaves de um JSON sem alterar seu conteúdo; a versão corrigida faz comparação estrutural, evitando interpretar apenas essa mudança de ordem como progresso diferente.
+
 ### 8.0.1 Como fazer a compra com cartão de teste
 
 Use uma conta de aluno comum criada com outro e-mail. A conta `rarphael@gmail.com` é administradora, já possui acesso liberado e não exibe **Assinar agora**.
