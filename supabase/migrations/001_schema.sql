@@ -45,3 +45,13 @@ create policy "subscriptions admin read" on public.subscriptions for select usin
 create policy "ai usage own read" on public.ai_daily_usage for select using(user_id=auth.uid() or public.is_admin());
 create or replace view public.admin_user_overview with(security_invoker=true) as select p.id,p.full_name,p.email,p.subscription_status,p.created_at from public.profiles p;
 grant select on public.admin_user_overview to authenticated;
+grant usage on schema public to authenticated, service_role;
+grant select on table public.profiles to authenticated;
+grant select, insert, update on table public.progress_snapshots to authenticated;
+grant select on table public.ai_daily_usage to authenticated;
+grant all privileges on table public.profiles to service_role;
+grant all privileges on table public.subscriptions to service_role;
+grant all privileges on table public.progress_snapshots to service_role;
+grant all privileges on table public.ai_daily_usage to service_role;
+grant select on table public.admin_user_overview to service_role;
+
