@@ -30,7 +30,13 @@ export async function onRequestGet({ request, env }) {
     if (!profile) throw new Error('O perfil não pôde ser criado.');
     return json({ profile });
   } catch (error) {
-    return json({ error: error.message || 'Não foi possível carregar seu perfil.' }, 500);
+    const raw = error.message || '';
+    const permission = raw.includes('42501') || raw.toLowerCase().includes('permission denied');
+    return json({
+      error: permission
+        ? 'O banco ainda precisa receber as permissões da migração 003.'
+        : raw || 'Não foi possível carregar seu perfil.',
+    }, 500);
   }
 }
 
