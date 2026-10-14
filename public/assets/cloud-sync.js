@@ -6,6 +6,9 @@
   let client;
   let user;
   let ready = false;
+  // While hydrating, the page still holds the pre-cloud state in memory; its
+  // pagehide handler would overwrite the hydrated localStorage before reload.
+  let hydrating = false;
   let timer;
   let observerTimer;
   let syncStatus;
@@ -72,6 +75,7 @@
   }
 
   function reloadAfterHydration() {
+    hydrating = true;
     const url = new URL(location.href);
     url.searchParams.set(HYDRATED_PARAM, '1');
     location.replace(`${url.pathname}${url.search}${url.hash}`);
@@ -185,6 +189,7 @@
   }
 
   Storage.prototype.setItem = function setItem(key, value) {
+    if (hydrating && this === localStorage && key === KEY) return;
     originalSetItem.call(this, key, value);
     if (this === localStorage && key === KEY) {
       lastObservedValue = value;
@@ -237,7 +242,7 @@
       location.href = '/dashboard.html';
       return;
     }
-    const active = profile?.role === 'admin' || ['active', 'trialing'].includes(profile?.subscription_status);
+    const active = Boolean(profile?.access?.active);
     if (!active) {
       location.href = '/dashboard.html';
       return;

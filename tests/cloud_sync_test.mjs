@@ -25,6 +25,12 @@ assert.equal(localWinsOverEmptyCloud.attempts[0].qid, 'q2');
 
 assert.match(source, /setInterval\(\(\) =>/);
 assert.match(source, /english-daily:state-saved/);
-assert.match(readFileSync(new URL('../public/app.html', import.meta.url), 'utf8'), /cloud-sync\.js\?v=20261014-2/);
+assert.match(readFileSync(new URL('../public/app.html', import.meta.url), 'utf8'), /cloud-sync\.js\?v=20261014-3/);
 
 console.log('cloud_sync_test: ok');
+
+// pagehide in app.html persists the pre-hydration in-memory state; it must not
+// overwrite the cloud state written right before the hydration reload.
+assert.match(source, /if \(hydrating && this === localStorage && key === KEY\) return;/);
+assert.match(source, /function reloadAfterHydration\(\) \{\n    hydrating = true;/);
+console.log('cloud_sync_test (hydration guard): ok');

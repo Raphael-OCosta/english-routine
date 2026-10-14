@@ -910,6 +910,14 @@ Como essa conta não possui cliente Stripe, o botão de gerenciamento de cobran�
 
 ---
 
+### 8.2 Conceder acesso de cortesia (usuário brinde)
+
+1. Execute no Supabase a migração `supabase/migrations/004_complimentary_grants.sql` (já aplicada em produção em 14/10/2026).
+2. Entre como administrador e abra **Minha conta → Painel administrativo**.
+3. Em **Acessos de cortesia**, informe o e-mail, a validade opcional (vazio = sem prazo) e uma observação; clique em **Conceder**.
+4. A pessoa entra ou cria conta em `/login.html` com o mesmo e-mail. O dashboard mostra **Cortesia** e libera o treino, sem passar pelo Stripe.
+5. Para encerrar, clique em **Revogar**. O histórico salvo na nuvem é preservado.
+
 ## Fase 9 — conectar o domínio
 
 Faça isso somente depois do teste no `pages.dev`.

@@ -1,1 +1,14 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin · English Routine</title><link rel="stylesheet" href="/assets/site.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/config.js"></script></head><body><div class="accountbar"><a href="/dashboard.html">← Minha conta</a><b>Administração</b></div><main class="wrap dashboard"><div class="eyebrow">English Routine</div><h2>Alunos e assinaturas</h2><section class="card"><table class="data-table"><thead><tr><th>Aluno</th><th>E-mail</th><th>Status</th><th>Cadastro</th></tr></thead><tbody id="users"></tbody></table><p id="status"></p></section></main><script src="/assets/admin.js"></script></body></html>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin · English Routine</title><link rel="stylesheet" href="/assets/site.css"><style>[hidden]{display:none!important}.grant-form{display:grid;grid-template-columns:2fr 1fr 2fr auto;gap:12px;align-items:end}.grant-form label{display:grid;gap:6px;font-weight:700;font-size:14px}.grant-form input{padding:11px;border:1px solid var(--line);border-radius:10px;font:inherit}.grant-form small{font-weight:400;color:var(--muted)}.table-scroll{overflow-x:auto}.link-button{background:none;color:#b83752;padding:4px 0;font-weight:700}.muted{color:var(--muted)}@media(max-width:760px){.grant-form{grid-template-columns:1fr}}</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/config.js"></script></head><body><div class="accountbar"><a href="/dashboard.html">← Minha conta</a><b>Administração</b></div><main class="wrap dashboard"><div class="eyebrow">English Routine</div>
+<h2>Acessos de cortesia</h2>
+<section class="card">
+<p class="muted">Libere o treino sem pagamento. A pessoa entra ou cria conta em <b>/login.html</b> com o mesmo e-mail; se ela já tiver conta, o acesso vale na hora.</p>
+<form id="grantForm" class="grant-form">
+<label>E-mail<input id="grantEmail" type="email" required autocomplete="off" placeholder="pessoa@exemplo.com"></label>
+<label>Válido até <small>(vazio = sem prazo)</small><input id="grantExpires" type="date"></label>
+<label>Observação<input id="grantNote" maxlength="200" placeholder="Ex.: presente de aniversário"></label>
+<button id="grantSubmit" type="submit">Conceder</button>
+</form>
+<p id="grantStatus" role="status"></p>
+<div class="table-scroll"><table class="data-table"><thead><tr><th>E-mail</th><th>Validade</th><th>Observação</th><th>Conta</th><th></th></tr></thead><tbody id="grants"></tbody></table></div>
+</section>
+<h2>Alunos e assinaturas</h2><section class="card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Aluno</th><th>E-mail</th><th>Status</th><th>Cadastro</th></tr></thead><tbody id="users"></tbody></table></div><p id="status"></p></section></main><script src="/assets/admin.js?v=20261014-3"></script></body></html>

@@ -1,4 +1,4 @@
-import { json, userFromRequest, adminRest } from './_shared.js';
+import { json, userFromRequest, adminRest, accessFor } from './_shared.js';
 
 export async function onRequestGet({ request, env }) {
   try {
@@ -28,7 +28,7 @@ export async function onRequestGet({ request, env }) {
 
     const profile = rows?.[0];
     if (!profile) throw new Error('O perfil não pôde ser criado.');
-    return json({ profile });
+    return json({ profile: { ...profile, access: await accessFor(env, user, profile) } });
   } catch (error) {
     const raw = error.message || '';
     const permission = raw.includes('42501') || raw.toLowerCase().includes('permission denied');

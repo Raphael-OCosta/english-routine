@@ -150,11 +150,19 @@
 
   document.querySelector('#studentName').textContent = profile.full_name || session.user.email.split('@')[0];
   document.querySelector('#accountEmail').textContent = session.user.email;
-  const active = ['active', 'trialing'].includes(profile.subscription_status) || profile.role === 'admin';
-  document.querySelector('#subscription').textContent = profile.role === 'admin' ? 'Administrador' : active ? 'Ativa' : 'Inativa';
-  document.querySelector('#accessMessage').textContent = active
-    ? 'Seu acesso está liberado. Continue de onde parou.'
-    : 'Assine para liberar todos os treinos e salvar o progresso na nuvem.';
+  const access = profile.access || { active: false, source: 'none' };
+  const active = Boolean(access.active);
+  const giftUntil = access.expires_at ? new Date(access.expires_at).toLocaleDateString('pt-BR') : '';
+  document.querySelector('#subscription').textContent = {
+    admin: 'Administrador',
+    subscription: 'Ativa',
+    gift: giftUntil ? `Cortesia até ${giftUntil}` : 'Cortesia',
+  }[access.source] || 'Inativa';
+  document.querySelector('#accessMessage').textContent = access.source === 'gift'
+    ? 'Você recebeu acesso de cortesia. Bons estudos!'
+    : active
+      ? 'Seu acesso está liberado. Continue de onde parou.'
+      : 'Assine para liberar todos os treinos e salvar o progresso na nuvem.';
   document.querySelector('#study').hidden = !active;
   document.querySelector('#subscribe').hidden = active;
   document.querySelector('#portal').hidden = !profile.stripe_customer_id;

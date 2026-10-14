@@ -54,3 +54,34 @@ export async function stripe(env, path, params) {
   return data;
 }
 
+
+const ACTIVE_STATUSES = ['active', 'trialing'];
+
+// Resolves whether a user may use the paid features: administrator, Stripe
+// subscription or an unexpired complimentary grant for the account e-mail.
+export async function accessFor(env, user, profile) {
+  if (profile?.role === 'admin') return { active: true, source: 'admin', expires_at: null };
+  if (ACTIVE_STATUSES.includes(profile?.subscription_status)) {
+    return { active: true, source: 'subscription', expires_at: null };
+  }
+  const email = String(user?.email || '').toLowerCase();
+  if (email) {
+    const grants = await adminRest(
+      env,
+      `complimentary_grants?email=eq.${encodeURIComponent(email)}&select=expires_at`,
+    );
+    const grant = grants?.[0];
+    if (grant && (!grant.expires_at || Date.parse(grant.expires_at) > Date.now())) {
+      return { active: true, source: 'gift', expires_at: grant.expires_at };
+    }
+  }
+  return { active: false, source: 'none', expires_at: null };
+}
+
+export async function requireActive(env, user) {
+  const rows = await adminRest(
+    env,
+    `profiles?id=eq.${encodeURIComponent(user.id)}&select=role,subscription_status`,
+  );
+  return (await accessFor(env, user, rows?.[0])).active;
+}
