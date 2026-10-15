@@ -1,7 +1,8 @@
 """Gera as páginas legais e de suporte em public/.
 
 Edite os dados em IDENTIDADE e rode: python build-legal.py
-Campos ainda não definidos aparecem destacados em amarelo no site.
+Documento e endereço são opcionais: vazios, são omitidos do texto. Valores
+entre colchetes com PENDENTE aparecem destacados em amarelo no site.
 """
 from pathlib import Path
 
@@ -9,8 +10,8 @@ PENDENTE = '<span class="pendente">[{}]</span>'
 
 IDENTIDADE = {
     'nome': 'Raphael Costa',
-    'documento': PENDENTE.format('CPF ou CNPJ'),
-    'endereco': PENDENTE.format('endereço completo para correspondência'),
+    'documento': '',  # CPF ou CNPJ
+    'endereco': '',  # endereço completo para correspondência
     'email': 'suporte@englishroutine.com.br',
     'site': 'englishroutine.com.br',
     'preco': 'R$ 39,90',
@@ -19,7 +20,7 @@ IDENTIDADE = {
 
 FOOTER = (
     '<footer class="footer"><div class="wrap footer-grid">'
-    '<div>© 2026 English Routine · {nome} · {documento}<br>'
+    '<div>© 2026 English Routine · {nome}{doc_sufixo}<br>'
     '<a href="mailto:{email}">{email}</a></div>'
     '<nav class="footer-links" aria-label="Informações legais">'
     '<a href="/termos.html">Termos de Uso</a>'
@@ -45,7 +46,7 @@ PAGE = '''<!doctype html>
 '''
 
 TERMOS = '''
-<p>Estes Termos regulam o uso da plataforma English Routine, disponível em {site}, oferecida por {nome}, {documento}, com endereço em {endereco} (“nós”). Ao criar uma conta você declara que leu e concorda com estes Termos e com a <a href="/privacidade.html">Política de Privacidade</a>.</p>
+<p>Estes Termos regulam o uso da plataforma English Routine, disponível em {site}, oferecida por {responsavel} (“nós”). Ao criar uma conta você declara que leu e concorda com estes Termos e com a <a href="/privacidade.html">Política de Privacidade</a>.</p>
 
 <h2>1. O serviço</h2>
 <p>A English Routine é uma plataforma on-line de prática de inglês com exercícios de gramática, leitura, escrita, escuta e fala, meta diária configurável e histórico de progresso salvo na conta do aluno. O conteúdo é de apoio ao estudo e não substitui cursos certificados nem confere certificação de nível.</p>
@@ -92,7 +93,7 @@ PRIVACIDADE = '''
 <p>Esta Política explica como a English Routine trata dados pessoais, em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 — LGPD).</p>
 
 <h2>1. Controlador e contato</h2>
-<p>Controlador: {nome}, {documento}, {endereco}. Encarregado pelo tratamento de dados e canal do titular: <a href="mailto:{email}">{email}</a>.</p>
+<p>Controlador: {responsavel}. Encarregado pelo tratamento de dados e canal do titular: <a href="mailto:{email}">{email}</a>.</p>
 
 <h2>2. Dados que tratamos</h2>
 <table>
@@ -182,7 +183,7 @@ SUPORTE = '''
 </ul>
 
 <h2>Dados do responsável</h2>
-<p>{nome} · {documento}<br>{endereco}</p>
+<p>{nome}{doc_sufixo}{endereco_linha}</p>
 '''
 
 PAGES = [
@@ -193,13 +194,25 @@ PAGES = [
 ]
 
 
+def campos():
+    ident = dict(IDENTIDADE)
+    doc, endereco = ident['documento'], ident['endereco']
+    ident['doc_sufixo'] = f' · {doc}' if doc else ''
+    ident['endereco_linha'] = f'<br>{endereco}' if endereco else ''
+    ident['responsavel'] = ', '.join(
+        [ident['nome']] + ([doc] if doc else []) + ([f'com endereço em {endereco}'] if endereco else [])
+    )
+    return ident
+
+
 def main():
     public = Path(__file__).resolve().parent / 'public'
-    footer = FOOTER.format(**IDENTIDADE)
+    ident = campos()
+    footer = FOOTER.format(**ident)
     for arquivo, titulo, corpo in PAGES:
         html = PAGE.format(
-            titulo=titulo, arquivo=arquivo, corpo=corpo.format(**IDENTIDADE).strip(),
-            footer=footer, **IDENTIDADE,
+            titulo=titulo, arquivo=arquivo, corpo=corpo.format(**ident).strip(),
+            footer=footer, **ident,
         )
         (public / arquivo).write_text(html, encoding='utf-8', newline='\n')
     # The same footer is used by the landing page between the markers below.
