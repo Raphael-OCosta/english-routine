@@ -108,7 +108,18 @@
   }
 
   function mergeStates(remote = {}, local = {}) {
-    const attempts = [...(Array.isArray(remote.attempts) ? remote.attempts : [])];
+    // resetAt marks a history reset made on the server; anything recorded
+    // before it (e.g. a stale copy on another device) must not come back.
+    const resetAt = [remote.resetAt, local.resetAt].filter(Boolean).sort().pop() || null;
+    const keep = item => !resetAt || String(item?.time || '') >= resetAt;
+    remote = { ...remote, attempts: (Array.isArray(remote.attempts) ? remote.attempts : []).filter(keep) };
+    local = { ...local, attempts: (Array.isArray(local.attempts) ? local.attempts : []).filter(keep) };
+    for (const side of [remote, local]) {
+      if (side.skills && Array.isArray(side.skills.events)) {
+        side.skills = { ...side.skills, events: side.skills.events.filter(keep) };
+      }
+    }
+    const attempts = [...remote.attempts];
     const attemptKeys = new Set(attempts.map(item => `${item.time}|${item.qid}`));
     for (const item of Array.isArray(local.attempts) ? local.attempts : []) {
       const key = `${item.time}|${item.qid}`;
@@ -147,6 +158,7 @@
       ...remote,
       ...local,
       version: 1,
+      ...(resetAt ? { resetAt } : {}),
       attempts,
       session: null,
       goalHistory,

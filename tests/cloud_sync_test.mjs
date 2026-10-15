@@ -25,7 +25,7 @@ assert.equal(localWinsOverEmptyCloud.attempts[0].qid, 'q2');
 
 assert.match(source, /setInterval\(\(\) =>/);
 assert.match(source, /english-daily:state-saved/);
-assert.match(readFileSync(new URL('../public/app.html', import.meta.url), 'utf8'), /cloud-sync\.js\?v=20261015-1/);
+assert.match(readFileSync(new URL('../public/app.html', import.meta.url), 'utf8'), /cloud-sync\.js\?v=20261015-2/);
 
 console.log('cloud_sync_test: ok');
 
@@ -41,3 +41,17 @@ assert.match(source, /function claimLocalCopy\(userId\)/);
 assert.match(source, /claimLocalCopy\(sessionUserId\(\)\);/);
 assert.match(source, /if \(claimLocalCopy\(user\.id\)\)/);
 console.log('cloud_sync_test (account isolation): ok');
+
+const resetAt = '2026-10-15T20:00:00.000Z';
+const afterReset = mergeStates(
+  { version: 1, resetAt, attempts: [], skills: { events: [], drafts: {}, accepted: [] } },
+  {
+    version: 1,
+    attempts: [remoteAttempt, { qid: 'q3', time: '2026-10-15T20:05:00.000Z' }],
+    skills: { events: [{ id: 'old', time: '2026-10-14T09:00:00.000Z' }], drafts: {}, accepted: [] },
+  },
+);
+assert.deepEqual(afterReset.attempts.map(item => item.qid), ['q3']);
+assert.equal(afterReset.skills.events.length, 0);
+assert.equal(afterReset.resetAt, resetAt);
+console.log('cloud_sync_test (history reset): ok');

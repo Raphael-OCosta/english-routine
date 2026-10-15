@@ -89,6 +89,9 @@
         ...state,
         ...current,
         version: 1,
+        // An explicit import restores old answers on purpose, so it clears
+        // the reset cut-off that would otherwise filter them out again.
+        resetAt: undefined,
         attempts,
         session: null,
         goalHistory,
