@@ -514,7 +514,7 @@ Não ative cobranças reais nesta fase.
 2. Clique em **Add product**.
 3. Use o nome **English Routine**.
 4. Escolha preço recorrente mensal em BRL.
-5. Defina o preço recorrente como **R$ 39,90 por mês**, conforme a decisão comercial do projeto.
+5. Defina o preço recorrente como **R$ 69,90 por mês** e, em "Opções avançadas", a *lookup key* `english_routine_mensal`. Para mudar o preço no futuro, crie um preço novo com a mesma lookup key (marcando "transferir lookup key") e arquive o antigo — não é preciso reimplantar.
 6. Salve e copie o identificador que começa com `price_`.
 
 Esse valor será `STRIPE_PRICE_ID`.

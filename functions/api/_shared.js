@@ -85,3 +85,20 @@ export async function requireActive(env, user) {
   );
   return (await accessFor(env, user, rows?.[0])).active;
 }
+
+// Resolves the subscription price by its Stripe lookup key, so a price change
+// only needs a new Stripe price with the same key (no redeploy). Falls back to
+// STRIPE_PRICE_ID for environments without the key.
+export async function subscriptionPriceId(env) {
+  const lookupKey = env.STRIPE_PRICE_LOOKUP_KEY || 'english_routine_mensal';
+  const params = new URLSearchParams({ active: 'true', limit: '1' });
+  params.append('lookup_keys[]', lookupKey);
+  const response = await fetch(`https://api.stripe.com/v1/prices?${params}`, {
+    headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw Error(data.error?.message || 'Stripe request failed');
+  const price = data.data?.[0]?.id || env.STRIPE_PRICE_ID;
+  if (!price) throw Error('Preço da assinatura não configurado.');
+  return price;
+}
