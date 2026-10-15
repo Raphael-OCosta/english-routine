@@ -25,7 +25,7 @@ assert.equal(localWinsOverEmptyCloud.attempts[0].qid, 'q2');
 
 assert.match(source, /setInterval\(\(\) =>/);
 assert.match(source, /english-daily:state-saved/);
-assert.match(readFileSync(new URL('../public/app.html', import.meta.url), 'utf8'), /cloud-sync\.js\?v=20261015-2/);
+assert.match(readFileSync(new URL('../public/app.html', import.meta.url), 'utf8'), /cloud-sync\.js\?v=20261015-3/);
 
 console.log('cloud_sync_test: ok');
 
@@ -55,3 +55,30 @@ assert.deepEqual(afterReset.attempts.map(item => item.qid), ['q3']);
 assert.equal(afterReset.skills.events.length, 0);
 assert.equal(afterReset.resetAt, resetAt);
 console.log('cloud_sync_test (history reset): ok');
+
+// The in-app reset writes an empty state; cloud-sync must stamp resetAt on it
+// and keep the stamp when the app later saves its in-memory state again.
+{
+  const store = new Map();
+  class FakeStorage {
+    getItem(key) { return store.has(key) ? store.get(key) : null; }
+    setItem(key, value) { store.set(key, String(value)); }
+    removeItem(key) { store.delete(key); }
+  }
+  const localStorage = new FakeStorage();
+  const window = { fetch: async () => ({}), ENGLISH_DAILY_CONFIG: { supabaseUrl: 'https://abc.supabase.co' } };
+  Function('window', 'localStorage', 'Storage', 'addEventListener', 'location', 'history', source)(
+    window, localStorage, FakeStorage, () => {}, { href: 'https://app.test/app.html' }, { replaceState() {} },
+  );
+  const key = 'english-daily-v1';
+  localStorage.setItem(key, JSON.stringify({ version: 1, attempts: [remoteAttempt], session: null }));
+  assert.equal(JSON.parse(localStorage.getItem(key)).resetAt, undefined);
+  localStorage.setItem(key, JSON.stringify({ version: 1, attempts: [], session: null }));
+  const stamped = JSON.parse(localStorage.getItem(key)).resetAt;
+  assert.match(stamped, /^\d{4}-\d{2}-\d{2}T/);
+  localStorage.setItem(key, JSON.stringify({ version: 1, attempts: [], session: null, appearance: 'dark' }));
+  assert.equal(JSON.parse(localStorage.getItem(key)).resetAt, stamped);
+  localStorage.setItem(key, JSON.stringify({ version: 1, attempts: [localAttempt], session: null }));
+  assert.equal(JSON.parse(localStorage.getItem(key)).resetAt, stamped);
+  console.log('cloud_sync_test (in-app reset stamp): ok');
+}

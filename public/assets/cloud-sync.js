@@ -226,8 +226,33 @@
     timer = setTimeout(() => flushToCloud(raw), 250);
   }
 
+  function historySize(state) {
+    const attempts = Array.isArray(state?.attempts) ? state.attempts.length : 0;
+    const events = Array.isArray(state?.skills?.events) ? state.skills.events.length : 0;
+    return attempts + events;
+  }
+
+  // The app's "reiniciar progresso" only writes an empty state locally. Stamp
+  // it with resetAt so mergeStates drops the old history everywhere instead of
+  // the union bringing it back; later saves of the in-memory state (which
+  // lacks the field) keep the stamp already stored.
+  function stampReset(value) {
+    const next = parseState(value);
+    if (!next) return value;
+    const previous = parseState(localStorage.getItem(KEY));
+    if (previous && historySize(previous) > 0 && historySize(next) === 0) {
+      next.resetAt = new Date().toISOString();
+    } else if (previous?.resetAt && !next.resetAt) {
+      next.resetAt = previous.resetAt;
+    } else {
+      return value;
+    }
+    return JSON.stringify(next);
+  }
+
   Storage.prototype.setItem = function setItem(key, value) {
     if (hydrating && this === localStorage && key === KEY) return;
+    if (this === localStorage && key === KEY) value = stampReset(String(value));
     originalSetItem.call(this, key, value);
     if (this === localStorage && key === KEY) {
       lastObservedValue = value;
@@ -236,7 +261,8 @@
   };
 
   addEventListener('english-daily:state-saved', event => {
-    const raw = event.detail?.raw || localStorage.getItem(KEY);
+    // Prefer the stored value: setItem may have stamped resetAt on it.
+    const raw = localStorage.getItem(KEY) || event.detail?.raw;
     if (!raw) return;
     lastObservedValue = raw;
     if (ready) queueSync(raw);
