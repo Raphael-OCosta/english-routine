@@ -25,7 +25,7 @@ assert.equal(localWinsOverEmptyCloud.attempts[0].qid, 'q2');
 
 assert.match(source, /setInterval\(\(\) =>/);
 assert.match(source, /english-daily:state-saved/);
-assert.match(readFileSync(new URL('../public/app.html', import.meta.url), 'utf8'), /cloud-sync\.js\?v=20261014-3/);
+assert.match(readFileSync(new URL('../public/app.html', import.meta.url), 'utf8'), /cloud-sync\.js\?v=20261015-1/);
 
 console.log('cloud_sync_test: ok');
 
@@ -34,3 +34,10 @@ console.log('cloud_sync_test: ok');
 assert.match(source, /if \(hydrating && this === localStorage && key === KEY\) return;/);
 assert.match(source, /function reloadAfterHydration\(\) \{\n    hydrating = true;/);
 console.log('cloud_sync_test (hydration guard): ok');
+
+// The browser copy must be discarded when a different account signs in,
+// otherwise mergeStates would join one account's history into another's.
+assert.match(source, /function claimLocalCopy\(userId\)/);
+assert.match(source, /claimLocalCopy\(sessionUserId\(\)\);/);
+assert.match(source, /if \(claimLocalCopy\(user\.id\)\)/);
+console.log('cloud_sync_test (account isolation): ok');

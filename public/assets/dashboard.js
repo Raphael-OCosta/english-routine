@@ -10,6 +10,8 @@
   logout.onclick = async () => {
     logout.disabled = true;
     await client.auth.signOut({ scope: 'local' });
+    ['english-daily-v1', 'english-daily-v1-cloud-pending', 'english-daily-v1-owner']
+      .forEach(key => localStorage.removeItem(key));
     location.replace('/login.html');
   };
 

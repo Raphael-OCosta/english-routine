@@ -17,6 +17,32 @@
   const nativeFetch = window.fetch.bind(window);
   const originalSetItem = Storage.prototype.setItem;
   const originalRemoveItem = Storage.prototype.removeItem;
+  const OWNER_KEY = `${KEY}-owner`;
+
+  // The local copy is shared by every account that signs in on this browser.
+  // Drop it before the app reads it unless it belongs to the signed-in user,
+  // otherwise the next sync would merge one account's history into another's.
+  function sessionUserId() {
+    try {
+      const ref = new URL(window.ENGLISH_DAILY_CONFIG.supabaseUrl).hostname.split('.')[0];
+      const raw = localStorage.getItem(`sb-${ref}-auth-token`);
+      const session = raw ? JSON.parse(raw) : null;
+      return (session?.user || session?.currentSession?.user)?.id || null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function claimLocalCopy(userId) {
+    if (!userId || localStorage.getItem(OWNER_KEY) === userId) return false;
+    const hadOtherData = Boolean(localStorage.getItem(KEY));
+    originalRemoveItem.call(localStorage, KEY);
+    originalRemoveItem.call(localStorage, PENDING_KEY);
+    originalSetItem.call(localStorage, OWNER_KEY, userId);
+    return hadOtherData;
+  }
+
+  claimLocalCopy(sessionUserId());
 
   window.fetch = async (input, init = {}) => {
     const url = typeof input === 'string' ? input : input.url;
@@ -229,6 +255,12 @@
       return;
     }
     user = session.user;
+    if (claimLocalCopy(user.id)) {
+      // The synchronous check could not identify the user and the app already
+      // loaded another account's history: reload with a clean local copy.
+      location.reload();
+      return;
+    }
 
     let profile;
     try {
