@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Korean Routine · Seu treino de coreano</title>
+<style>{{STYLES}}</style>
+{{GUARD}}
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">korean<span>routine.</span></div>
+  <nav role="tablist" aria-label="Seções">
+    <button role="tab" data-tab="practice" aria-selected="true">Treinar</button>
+    <button role="tab" data-tab="alphabet" aria-selected="false">Hangul</button>
+    <button role="tab" data-tab="guide" aria-selected="false">Guia</button>
+    <button role="tab" data-tab="progress" aria-selected="false">Meu progresso</button>
+  </nav>
+</header>
+<main>
+  <p id="voiceNotice" class="notice" hidden></p>
+
+  <section id="practice" role="tabpanel">
+    <div class="intro">
+      <span class="eyebrow">Coreano todos os dias · TOPIK 1–2</span>
+      <h1>안녕하세요! Vamos treinar.</h1>
+      <p class="muted">{{COUNT}} questões de hangul, vocabulário, partículas, verbos, números, frases e escuta — com temas de K-pop e dorama.</p>
+    </div>
+    <div class="layout">
+      <aside class="card filters">
+        <h2>Conteúdos</h2>
+        <div id="moduleFilters" class="checks"></div>
+        <h2>Nível</h2>
+        <div class="checks">
+          <label><input type="checkbox" id="level1" checked> TOPIK 1</label>
+          <label><input type="checkbox" id="level2" checked> TOPIK 2</label>
+        </div>
+        <h2>Meta diária</h2>
+        <div class="row"><input id="goal" type="number" min="5" max="200" step="5"> <span class="muted small">questões/dia</span></div>
+        <p id="goalStatus" class="small muted"></p>
+        <button id="newRound" class="primary">Nova rodada</button>
+        <button id="reviewRound">Revisar meus erros</button>
+      </aside>
+      <article class="card question" id="questionCard">
+        <div class="row between"><span id="qMeta" class="eyebrow"></span><span id="qCount" class="small muted"></span></div>
+        <p id="qPrompt" class="prompt"></p>
+        <div class="qtext-row"><p id="qText" class="qtext"></p><button id="speak" class="icon" title="Ouvir em coreano" aria-label="Ouvir em coreano">🔊</button></div>
+        <div id="options" class="options"></div>
+        <div id="feedback" class="feedback" hidden></div>
+        <div class="row between">
+          <span id="roundInfo" class="small muted"></span>
+          <button id="next" class="primary" hidden>Próxima →</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="alphabet" role="tabpanel" hidden>
+    <div class="intro"><span class="eyebrow">Alfabeto coreano</span><h1>Hangul</h1>
+      <p class="muted">Toque em uma letra ou sílaba para ouvir. A ㅇ no início da sílaba é muda; no final soa “ng”.</p></div>
+    <div class="card"><h2>Consoantes</h2><div id="consonants" class="letters"></div></div>
+    <div class="card"><h2>Vogais</h2><div id="vowels" class="letters"></div></div>
+    <div class="card"><h2>Monte sílabas</h2><p class="muted small">Consoante + vogal formam um bloco: ㄱ + ㅏ = 가.</p><div id="syllables" class="letters"></div></div>
+  </section>
+
+  <section id="guide" role="tabpanel" hidden>
+    <div class="intro"><span class="eyebrow">Explicações em português</span><h1>Guia de gramática</h1></div>
+    <div id="guideList"></div>
+  </section>
+
+  <section id="progress" role="tabpanel" hidden>
+    <div class="intro"><span class="eyebrow">Seu histórico</span><h1>Meu progresso</h1></div>
+    <div class="stats">
+      <div class="card stat"><span>Respondidas</span><strong id="sTotal">0</strong></div>
+      <div class="card stat"><span>Acertos</span><strong id="sRate">0%</strong></div>
+      <div class="card stat"><span>Hoje</span><strong id="sToday">0</strong></div>
+      <div class="card stat"><span>Para revisar</span><strong id="sWrong">0</strong></div>
+    </div>
+    <div class="card"><h2>Por conteúdo</h2><table class="table"><thead><tr><th>Conteúdo</th><th>Respondidas</th><th>Acertos</th></tr></thead><tbody id="byModule"></tbody></table></div>
+    <div class="card"><h2>Últimos erros</h2><div id="lastWrong"></div></div>
+    <div class="card danger"><h2>Reiniciar histórico</h2><p class="muted small">Apaga as respostas do Korean Routine em todos os seus aparelhos. Não afeta o English Routine.</p><button id="reset">Reiniciar histórico do coreano</button></div>
+  </section>
+</main>
+<footer class="footer">Korean Routine · parte do English Routine · <a href="/dashboard.html">Minha conta</a></footer>
+<script>{{DATA}}</script>
+<script>{{APP}}</script>
+</body>
+</html>

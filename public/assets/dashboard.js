@@ -234,13 +234,15 @@
   languageList.innerHTML = Object.entries(catalog).map(([code, lang]) => {
     const has = entitled.includes(code);
     // Idioma ainda não lançado aparece como "Em breve" para todos; o
-    // administrador tem acesso de teste, mas o app ainda não está publicado.
+    // administrador tem acesso de teste e abre o app pelo botão Testar.
     const status = !lang.available ? 'Em breve' : has ? 'Liberado' : 'Disponível';
     const detail = !lang.available && has ? 'Em breve · acesso de teste' : status;
     const box = selectable && lang.available
       ? `<input type="checkbox" data-language="${code}" ${has || (!active && code === 'en') ? 'checked' : ''}>`
       : '';
-    const action = has && lang.available ? `<a class="button" href="${escapeHtml(lang.app)}">Treinar</a>` : `<span class="badge">${status}</span>`;
+    const action = has
+      ? `<a class="button" href="${escapeHtml(lang.app)}">${lang.available ? 'Treinar' : 'Testar'}</a>`
+      : `<span class="badge">${status}</span>`;
     return `<div class="language-item"><label>${box}<span>${escapeHtml(lang.brand)}<small>${escapeHtml(lang.name)} · ${detail}</small></span></label>${action}</div>`;
   }).join('');
 
