@@ -10,7 +10,8 @@
   logout.onclick = async () => {
     logout.disabled = true;
     await client.auth.signOut({ scope: 'local' });
-    ['english-daily-v1', 'english-daily-v1-cloud-pending', 'english-daily-v1-owner']
+    Object.keys(localStorage)
+      .filter(key => key.startsWith('english-daily-v1') || key.startsWith('routine-'))
       .forEach(key => localStorage.removeItem(key));
     location.replace('/login.html');
   };
@@ -141,8 +142,10 @@
       }
     }
     if (!response.ok || !result.profile) throw new Error(result.error || 'Não foi possível carregar seu perfil.');
+    catalog = result.languages || { en: { name: 'Inglês', brand: 'English Routine', app: '/app.html', available: true } };
     return result.profile;
   }
+  let catalog = {};
 
   let profile;
   try {
@@ -194,7 +197,8 @@
     try {
       const response = await fetch(path, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${session.access_token}` },
+        headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(path.includes('checkout') ? { languages: checked() } : {}),
       });
       const data = await response.json();
       if (!response.ok) throw Error(data.error || 'Não foi possível continuar.');
@@ -208,6 +212,70 @@
   }
   const subscribe = document.querySelector('#subscribe');
   const portal = document.querySelector('#portal');
+
+  // ------------------------------------------------------------ idiomas
+  const PLAN_PRICES = { 1: 'R$ 44,90/mês', 2: 'R$ 74,90/mês', 3: 'R$ 99,90/mês' };
+  const subscriber = access.source === 'subscription';
+  const planSize = subscriber ? Math.max(1, Number(access.plan_size) || 1) : 3;
+  const entitled = Array.isArray(access.languages) ? access.languages : [];
+  const languageList = document.querySelector('#languageList');
+  const languagesStatus = document.querySelector('#languagesStatus');
+  const saveLanguages = document.querySelector('#saveLanguages');
+  const planPrice = document.querySelector('#planPrice');
+  const selectable = !active || subscriber;
+  document.querySelector('#languagesBox').hidden = false;
+  document.querySelector('#languagesSummary').textContent = subscriber
+    ? `Seu pacote inclui ${planSize} ${planSize === 1 ? 'idioma' : 'idiomas'}. Para incluir mais idiomas, altere o plano em Gerenciar cobrança.`
+    : active
+      ? 'Idiomas liberados no seu acesso.'
+      : 'Escolha os idiomas da sua assinatura: 1 idioma R$ 44,90, 2 idiomas R$ 74,90, 3 idiomas R$ 99,90 por mês.';
+
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  languageList.innerHTML = Object.entries(catalog).map(([code, lang]) => {
+    const has = entitled.includes(code);
+    const status = has ? 'Liberado' : lang.available ? 'Disponível' : 'Em breve';
+    const box = selectable && lang.available
+      ? `<input type="checkbox" data-language="${code}" ${has || (!active && code === 'en') ? 'checked' : ''}>`
+      : '';
+    const action = has && lang.available ? `<a class="button" href="${escapeHtml(lang.app)}">Treinar</a>` : `<span class="badge">${status}</span>`;
+    return `<div class="language-item"><label>${box}<span>${escapeHtml(lang.brand)}<small>${escapeHtml(lang.name)} · ${status}</small></span></label>${action}</div>`;
+  }).join('');
+
+  const checked = () => [...languageList.querySelectorAll('input[data-language]:checked')].map(input => input.dataset.language);
+  function refreshChoice() {
+    const count = checked().length;
+    if (!active) {
+      planPrice.hidden = count === 0;
+      planPrice.textContent = count ? `${count} ${count === 1 ? 'idioma' : 'idiomas'} · ${PLAN_PRICES[count]}` : '';
+      subscribe.disabled = count === 0;
+    }
+    if (subscriber) {
+      saveLanguages.hidden = false;
+      saveLanguages.disabled = count === 0 || count > planSize
+        || (count === entitled.length && checked().every(code => entitled.includes(code)));
+      languagesStatus.textContent = count > planSize ? `Seu pacote permite até ${planSize} ${planSize === 1 ? 'idioma' : 'idiomas'}.` : '';
+    }
+  }
+  languageList.addEventListener('change', refreshChoice);
+  refreshChoice();
+
+  saveLanguages.onclick = async () => {
+    saveLanguages.disabled = true;
+    languagesStatus.textContent = 'Salvando…';
+    try {
+      const response = await fetch('/api/languages', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ languages: checked() }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw Error(data.error || 'Não foi possível salvar.');
+      location.reload();
+    } catch (error) {
+      languagesStatus.textContent = error.message;
+      saveLanguages.disabled = false;
+    }
+  };
   subscribe.onclick = () => call('/api/create-checkout-session', subscribe, 'Abrindo o pagamento seguro do Stripe…');
   portal.onclick = () => call('/api/customer-portal', portal, 'Abrindo o portal de cobrança…');
 })();

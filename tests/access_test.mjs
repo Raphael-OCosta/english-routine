@@ -24,7 +24,11 @@ globalThis.fetch = async (url, options = {}) => {
 };
 
 const user = { id: 'u1', email: 'Amigo@Example.com' };
-assert.deepEqual(await accessFor(env, user, { role: 'admin' }), { active: true, source: 'admin', expires_at: null });
+assert.deepEqual(await accessFor(env, user, { role: 'admin' }), { active: true, source: 'admin', expires_at: null, languages: ['en', 'ko'], plan_size: 3 });
+const sub = await accessFor(env, user, { subscription_status: 'active', plan_size: 2, languages: ['en', 'ko', 'xx'] });
+assert.deepEqual(sub.languages, ['en', 'ko']);
+assert.equal(sub.plan_size, 2);
+assert.deepEqual((await accessFor(env, user, { subscription_status: 'active', plan_size: 1, languages: ['ko', 'en'] })).languages, ['ko']);
 assert.equal((await accessFor(env, user, { subscription_status: 'active' })).source, 'subscription');
 assert.equal((await accessFor(env, user, { subscription_status: 'inactive' })).active, false);
 grantRows = [{ expires_at: null }];

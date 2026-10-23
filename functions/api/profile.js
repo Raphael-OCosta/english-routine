@@ -1,11 +1,12 @@
 import { json, userFromRequest, adminRest, accessFor } from './_shared.js';
+import { LANGUAGES } from './_languages.js';
 
 export async function onRequestGet({ request, env }) {
   try {
     const user = await userFromRequest(request, env);
     if (!user) return json({ error: 'Não autenticado.' }, 401);
 
-    const select = 'full_name,role,subscription_status,stripe_customer_id';
+    const select = 'full_name,role,subscription_status,stripe_customer_id,languages,plan_size,languages_changed_at';
     let rows = await adminRest(
       env,
       `profiles?id=eq.${encodeURIComponent(user.id)}&select=${select}`,
@@ -28,7 +29,7 @@ export async function onRequestGet({ request, env }) {
 
     const profile = rows?.[0];
     if (!profile) throw new Error('O perfil não pôde ser criado.');
-    return json({ profile: { ...profile, access: await accessFor(env, user, profile) } });
+    return json({ profile: { ...profile, access: await accessFor(env, user, profile) }, languages: LANGUAGES });
   } catch (error) {
     const raw = error.message || '';
     const permission = raw.includes('42501') || raw.toLowerCase().includes('permission denied');

@@ -1,6 +1,10 @@
 (() => {
   window.ENGLISH_DAILY_CLOUD = true;
-  const KEY = 'english-daily-v1';
+  // Each language app declares window.ROUTINE_LANGUAGE before this script;
+  // English keeps the original storage key so existing histories stay put.
+  const LANGUAGE = window.ROUTINE_LANGUAGE || 'en';
+  const KEY = LANGUAGE === 'en' ? 'english-daily-v1' : `routine-${LANGUAGE}-v1`;
+  const PROGRESS_URL = `/api/progress?lang=${encodeURIComponent(LANGUAGE)}`;
   const PENDING_KEY = `${KEY}-cloud-pending`;
   const HYDRATED_PARAM = 'cloud_hydrated';
   let client;
@@ -176,14 +180,14 @@
   }
 
   async function remoteState() {
-    const response = await fetch('/api/progress', { cache: 'no-store' });
+    const response = await fetch(PROGRESS_URL, { cache: 'no-store' });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Não foi possível carregar o progresso.');
     return result.state || null;
   }
 
   async function saveRemoteState(state) {
-    const response = await fetch('/api/progress', {
+    const response = await fetch(PROGRESS_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ state }),
@@ -312,7 +316,9 @@
       location.href = '/dashboard.html';
       return;
     }
-    const active = Boolean(profile?.access?.active);
+    const languages = profile?.access?.languages;
+    const active = Boolean(profile?.access?.active)
+      && (!Array.isArray(languages) || languages.includes(LANGUAGE));
     if (!active) {
       location.href = '/dashboard.html';
       return;

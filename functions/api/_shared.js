@@ -1,3 +1,5 @@
+import { LANGUAGES, MAX_PLAN_SIZE, PLAN_LOOKUP_KEYS, availableLanguages, cleanLanguages } from './_languages.js';
+
 export const json = (data, status = 200) => new Response(JSON.stringify(data), {
   status,
   headers: {
@@ -57,40 +59,52 @@ export async function stripe(env, path, params) {
 
 const ACTIVE_STATUSES = ['active', 'trialing'];
 
-// Resolves whether a user may use the paid features: administrator, Stripe
-// subscription or an unexpired complimentary grant for the account e-mail.
+// Resolves whether a user may use the paid features and in which languages:
+// administrator (all languages, to test unreleased ones), Stripe subscription
+// (the languages chosen for the plan) or an unexpired complimentary grant.
 export async function accessFor(env, user, profile) {
-  if (profile?.role === 'admin') return { active: true, source: 'admin', expires_at: null };
+  if (profile?.role === 'admin') {
+    return { active: true, source: 'admin', expires_at: null, languages: Object.keys(LANGUAGES), plan_size: MAX_PLAN_SIZE };
+  }
   if (ACTIVE_STATUSES.includes(profile?.subscription_status)) {
-    return { active: true, source: 'subscription', expires_at: null };
+    const planSize = Math.min(MAX_PLAN_SIZE, Math.max(1, Number(profile?.plan_size) || 1));
+    const chosen = cleanLanguages(profile?.languages, { onlyAvailable: false, max: planSize });
+    return { active: true, source: 'subscription', expires_at: null, languages: chosen.length ? chosen : ['en'], plan_size: planSize };
   }
   const email = String(user?.email || '').toLowerCase();
   if (email) {
     const grants = await adminRest(
       env,
-      `complimentary_grants?email=eq.${encodeURIComponent(email)}&select=expires_at`,
+      `complimentary_grants?email=eq.${encodeURIComponent(email)}&select=expires_at,languages`,
     );
     const grant = grants?.[0];
     if (grant && (!grant.expires_at || Date.parse(grant.expires_at) > Date.now())) {
-      return { active: true, source: 'gift', expires_at: grant.expires_at };
+      const languages = Array.isArray(grant.languages) && grant.languages.length
+        ? cleanLanguages(grant.languages, { onlyAvailable: false })
+        : availableLanguages();
+      return { active: true, source: 'gift', expires_at: grant.expires_at, languages, plan_size: languages.length };
     }
   }
-  return { active: false, source: 'none', expires_at: null };
+  return { active: false, source: 'none', expires_at: null, languages: [], plan_size: 0 };
 }
 
-export async function requireActive(env, user) {
+export async function requireActive(env, user, language = 'en') {
   const rows = await adminRest(
     env,
-    `profiles?id=eq.${encodeURIComponent(user.id)}&select=role,subscription_status`,
+    `profiles?id=eq.${encodeURIComponent(user.id)}&select=role,subscription_status,languages,plan_size`,
   );
-  return (await accessFor(env, user, rows?.[0])).active;
+  const access = await accessFor(env, user, rows?.[0]);
+  return access.active && access.languages.includes(language);
 }
 
 // Resolves the subscription price by its Stripe lookup key, so a price change
-// only needs a new Stripe price with the same key (no redeploy). Falls back to
-// STRIPE_PRICE_ID for environments without the key.
-export async function subscriptionPriceId(env) {
-  const lookupKey = env.STRIPE_PRICE_LOOKUP_KEY || 'english_routine_mensal';
+// only needs a new Stripe price with the same key (no redeploy). The 1-language
+// plan falls back to STRIPE_PRICE_ID for environments without the key.
+export async function subscriptionPriceId(env, planSize = 1) {
+  const lookupKey = planSize === 1
+    ? env.STRIPE_PRICE_LOOKUP_KEY || PLAN_LOOKUP_KEYS[1]
+    : PLAN_LOOKUP_KEYS[planSize];
+  if (!lookupKey) throw Error('Pacote inválido.');
   const params = new URLSearchParams({ active: 'true', limit: '1' });
   params.append('lookup_keys[]', lookupKey);
   const response = await fetch(`https://api.stripe.com/v1/prices?${params}`, {
@@ -98,7 +112,7 @@ export async function subscriptionPriceId(env) {
   });
   const data = await response.json();
   if (!response.ok) throw Error(data.error?.message || 'Stripe request failed');
-  const price = data.data?.[0]?.id || env.STRIPE_PRICE_ID;
+  const price = data.data?.[0]?.id || (planSize === 1 ? env.STRIPE_PRICE_ID : null);
   if (!price) throw Error('Preço da assinatura não configurado.');
   return price;
 }

@@ -105,3 +105,12 @@ O diretório publicável será `saas/public` e as Functions ficam em `saas/funct
 - Domínio: valor anual variável conforme extensão e disponibilidade.
 
 Valores mudam. Confirme nos painéis antes da contratação.
+
+
+## Multi-idioma (English Routine + Korean Routine)
+
+- Catálogo em `functions/api/_languages.js`: um idioma só aparece para compra quando `available: true`.
+- Preços no Stripe por *lookup key*: `english_routine_mensal` (1 idioma, R$ 44,90), `routine_2_idiomas` (R$ 74,90), `routine_3_idiomas` (R$ 99,90).
+- Migração `supabase/migrations/006_multi_language.sql`: em produção aplique a etapa A antes do deploy e a etapa B (chave primária `(user_id, language)`) depois.
+- Cada app de idioma define `window.ROUTINE_LANGUAGE` antes de `cloud-sync.js`; o progresso é salvo em `/api/progress?lang=<código>`.
+- O assinante escolhe os idiomas em **Minha conta → Seus idiomas**; trocar um idioma já escolhido vale uma vez a cada 30 dias, ocupar vaga livre é imediato.

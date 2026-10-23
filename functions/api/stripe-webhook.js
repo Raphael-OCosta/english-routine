@@ -1,4 +1,5 @@
 import { json, adminRest } from './_shared.js';
+import { cleanLanguages, planSizeFromLookupKey } from './_languages.js';
 
 const enc = new TextEncoder();
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -73,9 +74,24 @@ export async function onRequestPost({ request, env }) {
           cancel_at_period_end: !!object.cancel_at_period_end,
         }),
       });
+      // Pacote pela lookup key do preço; idiomas pelos metadados do checkout.
+      // Troca de pacote no portal não traz idiomas: mantém os atuais dentro do limite.
+      const planSize = planSizeFromLookupKey(object.items?.data?.[0]?.price?.lookup_key);
+      const metadataLanguages = String(object.metadata?.languages || '').split(',').filter(Boolean);
+      const profiles = await adminRest(
+        env,
+        `profiles?stripe_customer_id=eq.${encodeURIComponent(customer)}&select=id,languages`,
+      );
+      const patch = { subscription_status: status };
+      if (planSize) {
+        patch.plan_size = planSize;
+        const source = metadataLanguages.length ? metadataLanguages : profiles?.[0]?.languages;
+        const languages = cleanLanguages(source, { onlyAvailable: false, max: planSize });
+        patch.languages = languages.length ? languages : ['en'];
+      }
       await adminRest(env, `profiles?stripe_customer_id=eq.${encodeURIComponent(customer)}`, {
         method: 'PATCH',
-        body: JSON.stringify({ subscription_status: status }),
+        body: JSON.stringify(patch),
       });
     }
 

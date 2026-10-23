@@ -25,7 +25,7 @@ assert.equal(localWinsOverEmptyCloud.attempts[0].qid, 'q2');
 
 assert.match(source, /setInterval\(\(\) =>/);
 assert.match(source, /english-daily:state-saved/);
-assert.match(readFileSync(new URL('../public/app.html', import.meta.url), 'utf8'), /cloud-sync\.js\?v=20261015-3/);
+assert.match(readFileSync(new URL('../public/app.html', import.meta.url), 'utf8'), /cloud-sync\.js\?v=20261023-1/);
 
 console.log('cloud_sync_test: ok');
 
