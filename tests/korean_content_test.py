@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "korean"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import build_korean as b  # noqa: E402
 
 qs = b.build()
@@ -53,6 +54,15 @@ for ko, rr in C.READING_WORDS:
 for ko, rr in {"맛있어요": "masisseoyo", "같이": "gachi", "읽어요": "ilgeoyo", "없어요": "eopseoyo",
                "몰라요": "mollayo", "독립": "dongnip", "좋네요": "jonneyo", "축하해요": "chukahaeyo"}.items():
     assert romanize(ko) == rr, (ko, romanize(ko))
+
+# Habilidades (módulo comum skills/): textos, propostas e "ouça e escolha"
+import skills_content as SK  # noqa: E402
+from skills.build import skills_bundle  # noqa: E402
+skills, _, _ = skills_bundle(SK.TEXTS, SK.PROMPTS, SK.ROLEPLAY, b.listen_choice(qs), romanize)
+assert len(skills["texts"]) >= 20 and len(skills["prompts"]) >= 16, (len(skills["texts"]), len(skills["prompts"]))
+assert {t["level"] for t in skills["texts"]} == {"TOPIK 1", "TOPIK 2"}
+assert all(t["roman"].count("\n\n") == t["text"].count("\n\n") for t in skills["texts"])
+assert len(skills["listenChoice"]) >= 100, len(skills["listenChoice"])
 
 html = (Path(__file__).resolve().parents[1] / "public" / "korean.html").read_text(encoding="utf-8")
 assert 'window.ROUTINE_LANGUAGE="ko"' in html

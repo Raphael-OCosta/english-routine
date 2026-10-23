@@ -9,10 +9,15 @@ import json
 import random
 from pathlib import Path
 
+import sys
+
 import content as C
+import skills_content as SK
 from romanize import has_syllable, romanize
 
 ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT.parent))
+from skills.build import skills_bundle  # noqa: E402
 PUBLIC = ROOT.parent / "public"
 GUARD = ('<style>html[data-cloud-auth="pending"] body{visibility:hidden}</style>'
          '<script>document.documentElement.dataset.cloudAuth="pending"</script>'
@@ -295,6 +300,20 @@ def validate(questions):
     assert has_batchim("학생") and not has_batchim("가수") and batchim_is_rieul("지하철")
 
 
+def listen_choice(questions):
+    """Ouça e escolha: frases completas que diferem só na lacuna (partícula ou verbo)."""
+    items = []
+    for q in questions:
+        if q["module"] not in ("verbos", "particulas") or q.get("slots") or q["text"].count("___") != 1:
+            continue
+        answer = q["text"].replace("___", q["answers"][0])
+        options = [answer] + [q["text"].replace("___", d) for d in q["distractors"][:3]]
+        options = list(dict.fromkeys(options))
+        if len(options) >= 3 and has_syllable(answer):
+            items.append({"answer": answer, "options": options, "explanation": q["explanation"]})
+    return items
+
+
 def roman_map(questions):
     """Pronúncia escrita das opções em hangul (mostrada abaixo de cada botão)."""
     out = {}
@@ -324,9 +343,15 @@ def main():
         "questions": questions, "modules": MODULES, "guide": C.GUIDE,
         "consonants": C.CONSONANTS, "vowels": C.VOWELS, "roman": roman_map(questions),
     }
+    choice = listen_choice(questions)
+    data["skills"], skills_css, skills_js = skills_bundle(SK.TEXTS, SK.PROMPTS, SK.ROLEPLAY, choice, romanize)
+    for item in choice:
+        for o in item["options"]:
+            data["roman"].setdefault(o, romanize(o))
     template = (ROOT / "src" / "template.html").read_text(encoding="utf-8")
     html = (template.replace("{{GUARD}}", GUARD)
-            .replace("{{STYLES}}", (ROOT / "src" / "styles.css").read_text(encoding="utf-8"))
+            .replace("{{STYLES}}", (ROOT / "src" / "styles.css").read_text(encoding="utf-8") + skills_css)
+            .replace("{{SKILLS}}", skills_js)
             .replace("{{DATA}}", "const KDATA = " + json.dumps(data, ensure_ascii=False) + ";")
             .replace("{{APP}}", (ROOT / "src" / "app.js").read_text(encoding="utf-8"))
             .replace("{{COUNT}}", f"{len(questions):,}".replace(",", ".")))

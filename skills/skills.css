@@ -1,0 +1,30 @@
+/* Routine Skills — estilos comuns. Usa as variáveis de cor do app do idioma:
+   --card --ink --muted --line --brand --accent --soft --good --good-soft --bad --bad-soft */
+.skill-heading h2{font-size:clamp(22px,3vw,32px);margin:6px 0 6px;letter-spacing:-.5px}
+.skill-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px}
+.skill-filters label,[id$=WritePick]~label,.card>label{display:block;font-weight:600;font-size:14px;margin:10px 0 4px}
+.card select,.card textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+.writing-area{min-height:220px;font-size:17px;line-height:1.7}
+.card textarea[readonly]{min-height:140px;font-size:13px}
+.timer-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
+.clock{font:700 26px/1 ui-monospace,monospace;min-width:84px}
+.passage{font-size:19px;line-height:1.9;background:var(--soft);border-radius:14px;padding:16px 18px;margin:12px 0;word-break:keep-all}
+.passage p{margin:0 0 10px}
+.quiz label{display:block;font-weight:600;margin:12px 0 4px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.notice{background:var(--soft);border-radius:12px;padding:10px 14px;white-space:pre-line}
+.lc-options{display:grid;gap:8px;margin:12px 0}
+.lc-options button{text-align:left;font-size:18px;font-weight:600}
+.lc-options button small{display:block;font-size:13px;font-weight:500;color:var(--muted)}
+.lc-options button.correct{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.lc-options button.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.lc-options button:disabled{opacity:1}
+.feedback.wrong{background:var(--bad-soft)}
+.self-check{border:1px solid var(--line);border-radius:12px;margin:14px 0;padding:10px 14px}
+.self-check label{display:flex;gap:8px;align-items:center;margin:4px 0;font-weight:500}
+.skill-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px}
+.skill-summary div{border:1px solid var(--line);border-radius:12px;padding:10px}
+.skill-summary span,.skill-summary small{display:block;color:var(--muted);font-size:13px}
+.skill-summary strong{font-size:24px}
+.saved-writing{white-space:pre-wrap;background:var(--soft);padding:10px;border-radius:10px;font:inherit}
+@media (max-width:640px){.skill-summary{grid-template-columns:repeat(2,1fr)}}

@@ -12,6 +12,10 @@
   <div class="brand">korean<span>routine.</span></div>
   <nav role="tablist" aria-label="Seções">
     <button role="tab" data-tab="practice" aria-selected="true">Treinar</button>
+    <button role="tab" data-tab="reading" aria-selected="false">Reading</button>
+    <button role="tab" data-tab="writing" aria-selected="false">Writing</button>
+    <button role="tab" data-tab="listening" aria-selected="false">Listening</button>
+    <button role="tab" data-tab="speaking" aria-selected="false">Speaking</button>
     <button role="tab" data-tab="alphabet" aria-selected="false">Hangul</button>
     <button role="tab" data-tab="guide" aria-selected="false">Guia</button>
     <button role="tab" data-tab="progress" aria-selected="false">Meu progresso</button>
@@ -65,6 +69,11 @@
     </div>
   </section>
 
+  <section id="reading" role="tabpanel" hidden></section>
+  <section id="writing" role="tabpanel" hidden></section>
+  <section id="listening" role="tabpanel" hidden></section>
+  <section id="speaking" role="tabpanel" hidden></section>
+
   <section id="alphabet" role="tabpanel" hidden>
     <div class="intro"><span class="eyebrow">Alfabeto coreano</span><h1>Hangul</h1>
       <p class="muted">Toque em uma letra ou sílaba para ouvir. A ㅇ no início da sílaba é muda; no final soa “ng”.</p></div>
@@ -87,11 +96,13 @@
       <div class="card stat"><span>Para revisar</span><strong id="sWrong">0</strong></div>
     </div>
     <div class="card"><h2>Por conteúdo</h2><table class="table"><thead><tr><th>Conteúdo</th><th>Respondidas</th><th>Acertos</th></tr></thead><tbody id="byModule"></tbody></table></div>
+    <div class="card"><h2>Reading, Writing, Listening e Speaking</h2><div id="skillsHistory"></div></div>
     <div class="card"><h2>Últimos erros</h2><div id="lastWrong"></div></div>
-    <div class="card danger"><h2>Reiniciar histórico</h2><p class="muted small">Apaga as respostas do Korean Routine em todos os seus aparelhos. Não afeta o English Routine.</p><button id="reset">Reiniciar histórico do coreano</button></div>
+    <div class="card danger"><h2>Reiniciar histórico</h2><p class="muted small">Apaga as respostas e os treinos de habilidades do Korean Routine em todos os seus aparelhos. Não afeta o English Routine.</p><button id="reset">Reiniciar histórico do coreano</button></div>
   </section>
 </main>
 <footer class="footer">Korean Routine · parte do English Routine · <a href="/dashboard.html">Minha conta</a></footer>
+<script>{{SKILLS}}</script>
 <script>{{DATA}}</script>
 <script>{{APP}}</script>
 </body>

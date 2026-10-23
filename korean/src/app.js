@@ -69,11 +69,14 @@
     return a;
   }
 
+  let skills = null;
+
   // ------------------------------------------------------------ abas
   document.querySelectorAll('[role=tab]').forEach(tab => tab.addEventListener('click', () => {
     document.querySelectorAll('[role=tab]').forEach(t => t.setAttribute('aria-selected', String(t === tab)));
     document.querySelectorAll('[role=tabpanel]').forEach(p => { p.hidden = p.id !== tab.dataset.tab; });
-    if (tab.dataset.tab === 'progress') renderProgress();
+    skills?.pause();
+    if (tab.dataset.tab === 'progress') { renderProgress(); skills?.renderHistory(); }
   }));
 
   // ------------------------------------------------------------ treino
@@ -387,8 +390,49 @@
     state = { ...emptyState(), goal: state.goal };
     save();
     renderProgress();
+    skills?.renderHistory();
     renderGoal();
     newRound(false);
+  });
+
+  // ------------------------------------------------------------ habilidades (módulo comum skills/)
+  const CONNECTORS = ['그리고', '그래서', '하지만', '그런데', '그러면', '왜냐하면', '그러니까', '또', '먼저', '마지막으로'];
+  function writingChecks(text) {
+    const notes = [];
+    const sentences = text.split(/[.!?\n]+/).map(x => x.trim()).filter(x => /[가-힣]/.test(x));
+    const polite = sentences.filter(x => /요$/.test(x)).length;
+    const formal = sentences.filter(x => /니다$/.test(x)).length;
+    const plain = sentences.filter(x => /[^니]다$/.test(x)).length;
+    const styles = [polite && '-요 (educado)', formal && '-ㅂ니다 (formal)', plain && '-다 (escrito/diário)'].filter(Boolean);
+    if (styles.length > 1) notes.push(`Você misturou estilos de terminação: ${styles.join(', ')}. Em um mesmo texto, escolha um.`);
+    else if (styles.length === 1) notes.push(`Terminação consistente: ${styles[0]}.`);
+    const latin = (text.match(/[A-Za-z]/g) || []).length;
+    const hangul = (text.match(/[가-힣]/g) || []).length;
+    if (latin > hangul * 0.2) notes.push('Há bastante alfabeto latino. Tente escrever tudo em hangul (nomes estrangeiros também podem ser escritos em hangul).');
+    const repeated = Object.entries((text.match(/[가-힣]+/g) || []).reduce((m, w) => ({ ...m, [w]: (m[w] || 0) + 1 }), {}))
+      .filter(([w, n]) => n >= 3 && w.length >= 2).map(([w]) => w);
+    if (repeated.length) notes.push(`Palavras repetidas 3+ vezes: <span lang="ko">${repeated.slice(0, 5).join(', ')}</span>. Varie com sinônimos ou junte frases com conectores.`);
+    if (/(은는|이가|을를)/.test(text)) notes.push('Parece haver duas partículas seguidas (ex.: 은는). Confira.');
+    return notes;
+  }
+  const tutorPrompt = (p, text) => `Corrija meu texto em coreano com explicações em português. Nível de treino: ${p.level}. `
+    + `Proposta: ${p.prompt} (${p.prompt_pt}). Meta: ${p.lines} linhas e ${p.units} sílabas. `
+    + 'Analise: cumprimento da proposta, partículas (은/는, 이/가, 을/를, 에/에서), conjugação e tempo verbal, consistência do nível de formalidade (-요, -ㅂ니다, -다), '
+    + 'espaçamento (띄어쓰기), ortografia e vocabulário. Mostre cada erro com a correção e a regra, depois uma versão revisada que preserve minhas ideias, '
+    + 'com romanização de frases difíceis. Termine com três prioridades para o próximo treino.\n\nMeu texto:\n' + text;
+
+  skills = RoutineSkills.mount({
+    lang: {
+      code: 'ko', name: 'coreano', html: 'ko', tts: 'ko-KR', voice: /^ko/i, rate: 0.85,
+      unit: 'syllables', unitLabel: 'sílabas', connectors: CONNECTORS, writePlaceholder: '여기에 한국어로 써 보세요…',
+    },
+    data: KDATA.skills,
+    roman: KDATA.roman,
+    skills: () => (state.skills ??= { events: [] }),
+    save,
+    day: today,
+    writingChecks,
+    tutorPrompt,
   });
 
   renderGoal();

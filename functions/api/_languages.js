@@ -1,8 +1,10 @@
 // Catálogo de idiomas e pacotes. `available` controla o que pode ser vendido:
 // um idioma só entra no checkout quando o conteúdo dele estiver publicado.
+// `speech`: código ISO-639-1 da transcrição e como comparar a fala no shadowing
+// (palavras para alfabetos com espaço; sílabas para hangul, kana e hanzi).
 export const LANGUAGES = {
-  en: { name: 'Inglês', brand: 'English Routine', app: '/app.html', available: true },
-  ko: { name: 'Coreano', brand: 'Korean Routine', app: '/korean.html', available: false },
+  en: { name: 'Inglês', brand: 'English Routine', app: '/app.html', available: true, speech: { transcribe: 'en', tokens: 'words' } },
+  ko: { name: 'Coreano', brand: 'Korean Routine', app: '/korean.html', available: false, speech: { transcribe: 'ko', tokens: 'syllables' } },
 };
 
 // Lookup keys dos preços no Stripe por quantidade de idiomas.
