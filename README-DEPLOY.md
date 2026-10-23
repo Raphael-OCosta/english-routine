@@ -42,7 +42,7 @@ Não envie senhas, chaves secretas ou códigos de recuperação pelo chat. Use c
 ## 2. Stripe
 
 1. Complete o cadastro empresarial, bancário e fiscal.
-2. Crie o produto **English Routine** e um preço mensal recorrente de **R$ 69,90** com a *lookup key* `english_routine_mensal` (o checkout encontra o preço por ela; `STRIPE_PRICE_ID` vira só reserva).
+2. Crie o produto **English Routine** e um preço mensal recorrente de **R$ 44,90** com a *lookup key* `english_routine_mensal` (o checkout encontra o preço por ela; `STRIPE_PRICE_ID` vira só reserva).
 3. Copie o `price_...` criado.
 4. Ative o **Customer Portal** com cancelamento e atualização do cartão.
 5. Quando conectar o domínio ao Cloudflare, crie um webhook para `https://englishroutine.com.br/api/stripe-webhook`.

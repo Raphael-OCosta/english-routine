@@ -14,7 +14,7 @@ IDENTIDADE = {
     'endereco': '',  # endereço completo para correspondência
     'email': 'suporte@englishroutine.com.br',
     'site': 'englishroutine.com.br',
-    'preco': 'R$ 69,90',
+    'preco': 'R$ 44,90',
     'atualizado': '15/10/2026',
 }
 
