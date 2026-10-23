@@ -88,11 +88,23 @@
   let answered = false;
   let roundCorrect = 0;
   let reviewMode = false;
+  let picks = [];
+
+  const mode = () => (document.querySelector('input[name=mode]:checked')?.value === 'typing' ? 'typing' : 'choice');
+  const slotsOf = q => q.slots || [{ answers: q.answers, distractors: q.distractors, label: '' }];
+  // Digitação só onde a resposta é hangul (significados em português ficam na múltipla escolha).
+  const typeable = q => slotsOf(q).every(s => s.answers.every(hasHangul));
+  const norm = s => String(s).normalize('NFC').replace(/[\s.?!,·~]/g, '').toLowerCase();
+  const romanOf = text => (state.showRoman !== false && KDATA.roman[text]) || '';
+  const optionLabel = o => {
+    const roman = romanOf(o);
+    return `<span${hasHangul(o) ? ' lang="ko"' : ''}>${esc(o)}</span>${roman ? `<small>${esc(roman)}</small>` : ''}`;
+  };
 
   function pool() {
     const modules = new Set([...filters.querySelectorAll('input:checked')].map(i => i.value));
     const levels = new Set([$('level1').checked && 1, $('level2').checked && 2].filter(Boolean));
-    return KDATA.questions.filter(q => modules.has(q.module) && levels.has(q.level));
+    return KDATA.questions.filter(q => modules.has(q.module) && levels.has(q.level) && (mode() === 'choice' || typeable(q)));
   }
 
   function wrongIds() {
@@ -106,15 +118,17 @@
     reviewMode = review;
     let list;
     if (review) {
-      list = wrongIds().map(id => byId.get(id));
+      list = wrongIds().map(id => byId.get(id)).filter(q => mode() === 'choice' || typeable(q));
       if (!list.length) {
-        showEmpty('Nenhum erro para revisar. 잘했어요! (Muito bem!)');
+        showEmpty('Nenhum erro para revisar neste formato. 잘했어요! (Muito bem!)');
         return;
       }
     } else {
       list = pool();
       if (!list.length) {
-        showEmpty('Escolha ao menos um conteúdo e um nível.');
+        showEmpty(mode() === 'typing'
+          ? 'Nenhuma questão para digitar nesta seleção. Inclua partículas, verbos, completar frases ou vocabulário.'
+          : 'Escolha ao menos um conteúdo e um nível.');
         return;
       }
       // Prioriza questões nunca vistas, depois as menos recentes.
@@ -135,61 +149,139 @@
     $('qCount').textContent = '';
     $('qPrompt').textContent = message;
     $('qText').textContent = '';
-    $('options').innerHTML = '';
-    $('feedback').hidden = true;
-    $('next').hidden = true;
-    $('speak').hidden = true;
+    for (const id of ['options', 'slots']) $(id).innerHTML = '';
+    for (const id of ['feedback', 'next', 'speak', 'check', 'typing', 'typingHint']) $(id).hidden = true;
     $('roundInfo').textContent = '';
   }
 
   function renderQuestion() {
     const q = round[index];
+    const slots = slotsOf(q);
+    const typing = mode() === 'typing';
+    const multi = slots.length > 1;
     answered = false;
+    picks = slots.map(() => null);
     $('qMeta').textContent = `${KDATA.modules[q.module]} · TOPIK ${q.level}${reviewMode ? ' · revisão' : ''}`;
     $('qCount').textContent = `${index + 1} de ${round.length}`;
     $('qPrompt').textContent = q.prompt;
     const qText = $('qText');
-    qText.innerHTML = esc(q.text).replace('___', '<span class="blank"></span>');
+    qText.innerHTML = esc(q.text).replace(/___/g, '<span class="blank"></span>');
     qText.lang = hasHangul(q.text) ? 'ko' : 'pt-BR';
-    $('speak').hidden = !q.audio;
-    const options = shuffle([q.answers[0], ...q.distractors.slice(0, 3)]);
-    $('options').innerHTML = options.map(o =>
-      `<button type="button" data-value="${esc(o)}"${hasHangul(o) ? ' lang="ko"' : ''}>${esc(o)}</button>`).join('');
+    // Em frases com lacunas o áudio entregaria a resposta: só toca depois de corrigir.
+    $('speak').hidden = !q.audio || q.module === 'completar';
+    $('typingHint').hidden = !typing;
+    $('options').innerHTML = '';
+    $('slots').innerHTML = '';
+    $('typing').hidden = !(typing && !multi);
+    $('check').hidden = !(typing || multi);
+    if (typing && !multi) {
+      $('typed').value = '';
+      $('typed').className = '';
+      $('typed').disabled = false;
+      setTimeout(() => $('typed').focus(), 0);
+    } else if (typing) {
+      $('slots').innerHTML = slots.map((s, i) =>
+        `<div class="slot"><h3>Lacuna ${i + 1} · ${esc(s.label)}</h3><input data-slot="${i}" lang="ko" autocomplete="off" autocapitalize="off" spellcheck="false"></div>`).join('');
+    } else if (multi) {
+      $('slots').innerHTML = slots.map((s, i) => {
+        const options = shuffle([s.answers[0], ...s.distractors.slice(0, 3)]);
+        return `<div class="slot"><h3>Lacuna ${i + 1} · ${esc(s.label)}</h3><div class="slot-options">${options.map(o =>
+          `<button type="button" data-slot="${i}" data-value="${esc(o)}">${optionLabel(o)}</button>`).join('')}</div></div>`;
+      }).join('');
+    } else {
+      const options = shuffle([q.answers[0], ...q.distractors.slice(0, 3)]);
+      $('options').innerHTML = options.map(o => `<button type="button" data-value="${esc(o)}">${optionLabel(o)}</button>`).join('');
+    }
     $('feedback').hidden = true;
     $('next').hidden = true;
     $('roundInfo').textContent = `Acertos na rodada: ${roundCorrect}`;
     if (q.module === 'escuta') setTimeout(() => speak(q.audio), 250);
   }
 
-  $('options').addEventListener('click', event => {
-    const button = event.target.closest('button');
-    if (!button || answered || !round.length) return;
-    answered = true;
+  function finish(values) {
+    if (answered || !round.length) return;
     const q = round[index];
-    const value = button.dataset.value;
-    const correct = q.answers.includes(value);
+    const slots = slotsOf(q);
+    if (values.some(v => !String(v || '').trim())) {
+      $('roundInfo').textContent = slots.length > 1 ? 'Preencha todas as lacunas.' : 'Digite sua resposta.';
+      return;
+    }
+    answered = true;
+    const results = slots.map((s, i) => s.answers.some(a => norm(a) === norm(values[i])));
+    const correct = results.every(Boolean);
     if (correct) roundCorrect++;
+
+    // Marca certo/errado em cada controle.
     $('options').querySelectorAll('button').forEach(b => {
       b.disabled = true;
       if (q.answers.includes(b.dataset.value)) b.classList.add('correct');
+      else if (b.dataset.value === values[0]) b.classList.add('wrong');
     });
-    if (!correct) button.classList.add('wrong');
+    $('slots').querySelectorAll('button').forEach(b => {
+      b.disabled = true;
+      const s = slots[Number(b.dataset.slot)];
+      if (s.answers.includes(b.dataset.value)) b.classList.add('correct');
+      else if (b.classList.contains('picked')) b.classList.add('wrong');
+    });
+    $('slots').querySelectorAll('input').forEach(input => {
+      input.disabled = true;
+      input.classList.add(results[Number(input.dataset.slot)] ? 'correct' : 'wrong');
+    });
+    if (!$('typing').hidden) {
+      $('typed').disabled = true;
+      $('typed').classList.add(correct ? 'correct' : 'wrong');
+    }
+    $('check').hidden = true;
 
     const day = today();
-    state.attempts.push({ qid: q.id, answer: value, correct, day, review: reviewMode, mode: 'choice', time: new Date().toISOString() });
+    state.attempts.push({
+      qid: q.id, answer: values.join(' · '), correct, day, review: reviewMode, mode: mode(), time: new Date().toISOString(),
+    });
     state.goalHistory = { ...(state.goalHistory || {}), [day]: Number(state.goal) || 20 };
     save();
 
     const fb = $('feedback');
     fb.className = 'feedback' + (correct ? ' ok' : '');
+    const expected = slots.map(s => s.answers[0]);
+    let complete = q.text;
+    if (q.text.includes('___')) expected.forEach(v => { complete = complete.replace('___', v); });
+    else complete = expected.join(' · ');
     const roman = q.roman ? ` <span class="muted">(${esc(q.roman)})</span>` : '';
-    fb.innerHTML = `<strong>${correct ? 'Correto! 맞아요!' : `Resposta: <span lang="ko">${esc(q.answers[0])}</span>`}</strong>${roman}<br>${esc(q.explanation)}`;
+    fb.innerHTML = `<strong>${correct ? 'Correto! 맞아요!' : 'Resposta certa:'}</strong>${roman}<br>`
+      + `<span${hasHangul(complete) ? ' lang="ko"' : ''}>${esc(complete)}</span><br>${esc(q.explanation)}`;
     fb.hidden = false;
     if (q.audio && q.module !== 'escuta') speak(q.audio);
+    $('speak').hidden = !q.audio;
     $('next').textContent = index + 1 < round.length ? 'Próxima →' : 'Nova rodada';
     $('next').hidden = false;
     $('roundInfo').textContent = `Acertos na rodada: ${roundCorrect}`;
     renderGoal();
+  }
+
+  $('options').addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (button) finish([button.dataset.value]);
+  });
+  $('slots').addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button || answered) return;
+    const i = Number(button.dataset.slot);
+    picks[i] = button.dataset.value;
+    $('slots').querySelectorAll(`button[data-slot="${i}"]`).forEach(b => b.classList.toggle('picked', b === button));
+  });
+  $('check').addEventListener('click', () => {
+    if (mode() === 'typing') {
+      const inputs = [...$('slots').querySelectorAll('input')];
+      finish(inputs.length ? inputs.map(i => i.value) : [$('typed').value]);
+    } else {
+      finish(picks);
+    }
+  });
+  addEventListener('keydown', event => {
+    // isComposing: o Enter que fecha a sílaba no teclado coreano não corrige.
+    if (event.key !== 'Enter' || event.isComposing) return;
+    if (!$('check').hidden && event.target.closest?.('#questionCard')) { event.preventDefault(); $('check').click(); }
+    else if (!$('next').hidden && !event.target.closest?.('button')) { event.preventDefault(); $('next').click(); }
   });
 
   $('next').addEventListener('click', () => {
@@ -203,6 +295,20 @@
   $('speak').addEventListener('click', () => { const q = round[index]; if (q) speak(q.audio); });
   $('newRound').addEventListener('click', () => newRound(false));
   $('reviewRound').addEventListener('click', () => newRound(true));
+  document.querySelectorAll('input[name=mode]').forEach(input => {
+    input.checked = input.value === (state.mode === 'typing' ? 'typing' : 'choice');
+    input.addEventListener('change', () => { state.mode = mode(); save(); newRound(false); });
+  });
+  $('showRoman').checked = state.showRoman !== false;
+  $('showRoman').addEventListener('change', () => {
+    state.showRoman = $('showRoman').checked;
+    save();
+    document.querySelectorAll('#options button, .slot-options button').forEach(b => {
+      b.querySelector('small')?.remove();
+      const roman = romanOf(b.dataset.value);
+      if (roman) b.insertAdjacentHTML('beforeend', `<small>${esc(roman)}</small>`);
+    });
+  });
 
   const goalInput = $('goal');
   goalInput.value = state.goal || 20;

@@ -24,7 +24,7 @@
     <div class="intro">
       <span class="eyebrow">Coreano todos os dias · TOPIK 1–2</span>
       <h1>안녕하세요! Vamos treinar.</h1>
-      <p class="muted">{{COUNT}} questões de hangul, vocabulário, partículas, verbos, números, frases e escuta — com temas de K-pop e dorama.</p>
+      <p class="muted">{{COUNT}} questões de hangul, vocabulário, partículas, verbos, frases para completar, números e escuta — com temas de K-pop e dorama. Responda escolhendo ou digitando em hangul.</p>
     </div>
     <div class="layout">
       <aside class="card filters">
@@ -34,6 +34,12 @@
         <div class="checks">
           <label><input type="checkbox" id="level1" checked> TOPIK 1</label>
           <label><input type="checkbox" id="level2" checked> TOPIK 2</label>
+        </div>
+        <h2>Formato</h2>
+        <div class="checks">
+          <label><input type="radio" name="mode" value="choice" checked> Múltipla escolha</label>
+          <label><input type="radio" name="mode" value="typing"> Digitar em hangul</label>
+          <label><input type="checkbox" id="showRoman" checked> Mostrar pronúncia nas opções</label>
         </div>
         <h2>Meta diária</h2>
         <div class="row"><input id="goal" type="number" min="5" max="200" step="5"> <span class="muted small">questões/dia</span></div>
@@ -45,7 +51,11 @@
         <div class="row between"><span id="qMeta" class="eyebrow"></span><span id="qCount" class="small muted"></span></div>
         <p id="qPrompt" class="prompt"></p>
         <div class="qtext-row"><p id="qText" class="qtext"></p><button id="speak" class="icon" title="Ouvir em coreano" aria-label="Ouvir em coreano">🔊</button></div>
+        <p id="typingHint" class="small muted" hidden>Para digitar em hangul, ative o teclado coreano: no Windows, Configurações › Hora e idioma › Idioma › Adicionar “Coreano” (alterne com Win + Espaço e use a tecla 한/영 ou Alt direito); no celular, adicione o teclado coreano.</p>
         <div id="options" class="options"></div>
+        <div id="slots" class="slots"></div>
+        <div id="typing" class="typing" hidden><input id="typed" lang="ko" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Digite a resposta"></div>
+        <button id="check" class="primary" hidden>Corrigir</button>
         <div id="feedback" class="feedback" hidden></div>
         <div class="row between">
           <span id="roundInfo" class="small muted"></span>

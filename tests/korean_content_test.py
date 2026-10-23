@@ -34,6 +34,26 @@ for q in qs:
         if ans in (withb, without):
             assert ans == (withb if b.has_batchim(word) else without), (q["id"], word, ans)
 
+# Frases com várias lacunas: partículas pela regra do batchim
+multi = [q for q in qs if q.get("slots")]
+assert len(multi) >= 600, len(multi)
+for q in multi:
+    words = re.findall(r"(\S+?)___", q["text"])
+    for word, s in zip(words, q["slots"]):
+        ans = s["answers"][0]
+        for withb, without in {("은", "는"), ("을", "를")}:
+            if ans in (withb, without):
+                assert ans == (withb if b.has_batchim(word) else without), (q["id"], word, ans)
+
+# Romanização (pronúncia mostrada abaixo das opções) confere com a RR oficial
+from romanize import romanize  # noqa: E402
+import content as C  # noqa: E402
+for ko, rr in C.READING_WORDS:
+    assert romanize(ko) == rr.lower(), (ko, romanize(ko), rr)
+for ko, rr in {"맛있어요": "masisseoyo", "같이": "gachi", "읽어요": "ilgeoyo", "없어요": "eopseoyo",
+               "몰라요": "mollayo", "독립": "dongnip", "좋네요": "jonneyo", "축하해요": "chukahaeyo"}.items():
+    assert romanize(ko) == rr, (ko, romanize(ko))
+
 html = (Path(__file__).resolve().parents[1] / "public" / "korean.html").read_text(encoding="utf-8")
 assert 'window.ROUTINE_LANGUAGE="ko"' in html
 assert "{{" not in html

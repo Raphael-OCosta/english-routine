@@ -10,6 +10,7 @@ import random
 from pathlib import Path
 
 import content as C
+from romanize import has_syllable, romanize
 
 ROOT = Path(__file__).resolve().parent
 PUBLIC = ROOT.parent / "public"
@@ -41,16 +42,22 @@ def build():
     rng = random.Random(20261023)
     questions = []
 
-    def add(prefix, module, level, theme, prompt, text, answers, distractors, explanation, audio=None, roman=None):
+    def add(prefix, module, level, theme, prompt, text, answers, distractors, explanation, audio=None, roman=None, slots=None):
         answers = list(dict.fromkeys(answers))
         distractors = [d for d in dict.fromkeys(distractors) if d not in answers]
         assert len(distractors) >= 1, (prefix, text)
         serial = sum(1 for q in questions if q["id"].startswith(prefix)) + 1
-        questions.append({
+        question = {
             "id": f"{prefix}{serial:04d}", "module": module, "level": level, "theme": theme,
             "prompt": prompt, "text": text, "answers": answers, "distractors": distractors,
             "explanation": explanation, "audio": audio, "roman": roman,
-        })
+        }
+        if slots:
+            question["slots"] = slots
+        questions.append(question)
+
+    def slot(right, wrong, label):
+        return {"answers": [right], "distractors": [w for w in dict.fromkeys(wrong) if w != right], "label": label}
 
     # ---------------------------------------------------------- hangul: letras
     cons_rr = [rr for _, rr, _ in C.CONSONANTS]
@@ -221,6 +228,41 @@ def build():
         add("kg", "verbos", 2, "adjetivos", f"Passado de {dic} ({pt}).", f"어제 {subj} ___.",
             [past], [pres, dic, stem + "었요"], "Passado de adjetivo: -았어요/-었어요.", audio=f"어제 {subj} {past}.")
 
+    # ---------------------------------------------------------- completar (2–3 lacunas)
+    # Mesma ideia das combinações do inglês: várias lacunas na mesma frase.
+    def topic_slot(noun):
+        right = particle(noun, "은", "는")
+        return slot(right, ["는" if right == "은" else "은", particle(noun, "을", "를")], "tópico")
+
+    def object_slot(noun):
+        right = particle(noun, "을", "를")
+        return slot(right, ["를" if right == "을" else "을", "에", particle(noun, "이", "가")], "objeto")
+
+    place_slot = slot("에서", ["에", "로"], "lugar da ação")
+    for place, obj, dic, pres, past, fut in C.COMBO_ACTIVITIES:
+        for subj in C.COMBO_SUBJECTS:
+            slots = [topic_slot(subj), place_slot, object_slot(obj)]
+            joined = [s["answers"][0] for s in slots]
+            full = f"{subj}{joined[0]} {place}{joined[1]} {obj}{joined[2]} {pres}."
+            add("kc", "completar", 2, "partículas", "Complete as três lacunas (tópico, lugar e objeto).",
+                f"{subj}___ {place}___ {obj}___ {pres}.", [" · ".join(joined)], ["-"],
+                f"{subj}{joined[0]}: tópico ({'com' if has_batchim(subj) else 'sem'} batchim). {place}에서: lugar onde a ação acontece. "
+                f"{obj}{joined[2]}: objeto ({'com' if has_batchim(obj) else 'sem'} batchim).", audio=full, slots=slots)
+        for subj in C.COMBO_SUBJECTS:
+            slots = [topic_slot(subj), object_slot(obj), slot(past, [pres, fut, dic], f"{dic} no passado")]
+            joined = [s["answers"][0] for s in slots]
+            full = f"어제 {subj}{joined[0]} {obj}{joined[1]} {past}."
+            add("kc", "completar", 2, "passado", f"Complete as lacunas. Use {dic} no passado.",
+                f"어제 {subj}___ {obj}___ ___.", [" · ".join(joined)], ["-"],
+                f"어제 (ontem) pede passado: {dic} → {past}. Partículas: {subj}{joined[0]}, {obj}{joined[1]}.", audio=full, slots=slots)
+        for subj in C.COMBO_SUBJECTS:
+            slots = [topic_slot(subj), object_slot(obj)]
+            joined = [s["answers"][0] for s in slots]
+            full = f"내일 {subj}{joined[0]} {obj}{joined[1]} {fut}."
+            add("kc", "completar", 1, "futuro", "Complete as duas lacunas.",
+                f"내일 {subj}___ {obj}___ {fut}.", [" · ".join(joined)], ["-"],
+                f"{subj}{joined[0]}: tópico. {obj}{joined[1]}: objeto. {fut} = futuro de {dic}.", audio=full, slots=slots)
+
     # ---------------------------------------------------------- números
     for ko, pt, wrong in C.NUMBERS:
         add("kn", "numeros", 1, "números", f"Como se diz “{pt}”?", pt, [ko], wrong,
@@ -242,15 +284,36 @@ def validate(questions):
     for q in questions:
         assert q["answers"] and q["distractors"], q["id"]
         assert not set(q["answers"]) & set(q["distractors"]), q["id"]
-        if "___" in q["text"]:
+        if q.get("slots"):
+            assert q["text"].count("___") == len(q["slots"]) >= 2, q["id"]
+            for s in q["slots"]:
+                assert s["answers"] and s["distractors"], q["id"]
+                assert not set(s["answers"]) & set(s["distractors"]), q["id"]
+        elif "___" in q["text"]:
             assert q["text"].count("___") == 1, q["id"]
     # partículas: conferência independente da regra do batchim
     assert has_batchim("학생") and not has_batchim("가수") and batchim_is_rieul("지하철")
 
 
+def roman_map(questions):
+    """Pronúncia escrita das opções em hangul (mostrada abaixo de cada botão)."""
+    out = {}
+    for q in questions:
+        if q["module"] in ("hangul", "leitura"):
+            continue  # ali a romanização é a própria resposta
+        options = q["answers"] + q["distractors"]
+        for s in q.get("slots", []):
+            options += s["answers"] + s["distractors"]
+        for o in options:
+            if has_syllable(o) and o not in out:
+                out[o] = romanize(o.replace("?", "").replace("!", "").replace(",", ""))
+    return out
+
+
 MODULES = {
     "hangul": "Hangul (letras)", "leitura": "Leitura", "vocabulario": "Vocabulário", "escuta": "Escuta",
-    "particulas": "Partículas", "verbos": "Verbos e adjetivos", "numeros": "Números", "frases": "Frases do dia a dia",
+    "particulas": "Partículas", "verbos": "Verbos e adjetivos", "completar": "Completar frases (2–3 lacunas)", "numeros": "Números",
+    "frases": "Frases do dia a dia",
 }
 
 
@@ -259,7 +322,7 @@ def main():
     validate(questions)
     data = {
         "questions": questions, "modules": MODULES, "guide": C.GUIDE,
-        "consonants": C.CONSONANTS, "vowels": C.VOWELS,
+        "consonants": C.CONSONANTS, "vowels": C.VOWELS, "roman": roman_map(questions),
     }
     template = (ROOT / "src" / "template.html").read_text(encoding="utf-8")
     html = (template.replace("{{GUARD}}", GUARD)
