@@ -92,6 +92,10 @@ Todos com `id`, `time`, `day`. O `cloud-sync` mescla por `id` entre aparelhos e 
 - Chinês: `chinese/` (tons, pinyin por dicionário, classificadores; ao digitar aceita caracteres ou pinyin com/sem tons).
 - Espanhol: `spanish/` (alfabeto latino: questões marcam `typeable`; conjugação por regra + irregulares; falsos amigos para brasileiros; `levelNames` A1/A2).
 - Japonês: `japanese/` (hiragana/katakana, leituras de kanji por dicionário, romaji Hepburn com partículas wa/e/o; ao digitar aceita kana ou romaji; `levelNames` N5/N4).
+- Francês: `french/` (elisão j'/l'/n'/d', contrações au/aux, passé composé com avoir/être, imparfait, futur proche).
+- Italiano: `italian/` (artigos il/lo/l'/la/i/gli/le calculados pelo substantivo, preposições articuladas, -care/-iare/-isc-, essere com concordância nos dois gêneros).
+- Alemão: `german/` (acusativo den/kein, movimento × lugar ins/im, verbo na 2ª posição e particípio/infinitivo no final, haben × sein).
+- Distratores: liste por tempo verbal só as formas que ficam erradas com o marcador da frase (Oggi/Ieri/Anni fa…); nunca ofereça uma forma alternativa também correta (ex.: "in stazione" × "alla stazione").
 
 Dicas gerais:
 - Idiomas de alfabeto latino não conseguem decidir pelo `script` o que é digitável: marque `typeable: true/false` em cada questão.

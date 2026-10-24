@@ -177,7 +177,7 @@ h2{font-size:clamp(30px,4.2vw,46px);line-height:1.1;letter-spacing:-1.2px;margin
       <h1>Aprenda <span class="rotator" id="rotator"><span>inglês</span></span><br>no seu ritmo.</h1>
       <p class="lead">Gramática, reading, writing, listening e speaking com explicações em português, meta diária e progresso salvo na sua conta. Um idioma ou vários, na mesma assinatura.</p>
       <div class="actions"><a class="button" href="/login.html?mode=signup">Começar agora →</a><a class="button ghost" href="#idiomas">Ver os idiomas</a></div>
-      <div class="trust"><div><b data-count="12000">0</b>questões</div><div><b data-count="4">0</b>habilidades</div><div><b id="langCount">0</b>idiomas no caminho</div></div>
+      <div class="trust"><div><b data-count="80000" data-prefix="+">0</b>questões</div><div><b data-count="4">0</b>habilidades</div><div><b id="langCount">0</b>idiomas no caminho</div></div>
     </div>
     <div class="orbit" id="orbit" aria-label="Idiomas da plataforma">
       <div class="ring"></div><div class="ring r2"></div>
@@ -256,9 +256,9 @@ const LANGS = [
   { code: 'zh', name: 'Chinês (mandarim)', native: '中文', hello: '你好！', word: 'chinês', status: 'beta', note: 'Pinyin, tons e HSK 1–2' },
   { code: 'es', name: 'Espanhol', native: 'Español', hello: '¡Hola!', word: 'espanhol', status: 'beta', note: 'A1–A2 · falsos amigos para brasileiros' },
   { code: 'ja', name: 'Japonês', native: '日本語', hello: 'こんにちは!', word: 'japonês', status: 'beta', note: 'Hiragana, katakana e JLPT N5–N4' },
-  { code: 'fr', name: 'Francês', native: 'Français', hello: 'Bonjour !', word: 'francês', status: 'soon', note: 'Em breve' },
-  { code: 'it', name: 'Italiano', native: 'Italiano', hello: 'Ciao!', word: 'italiano', status: 'soon', note: 'Em breve' },
-  { code: 'de', name: 'Alemão', native: 'Deutsch', hello: 'Hallo!', word: 'alemão', status: 'soon', note: 'Em breve' },
+  { code: 'fr', name: 'Francês', native: 'Français', hello: 'Bonjour !', word: 'francês', status: 'beta', note: 'A1–A2 · elisão, partitivos e passé composé' },
+  { code: 'it', name: 'Italiano', native: 'Italiano', hello: 'Ciao!', word: 'italiano', status: 'beta', note: 'A1–A2 · artigos, preposições e falsos amigos' },
+  { code: 'de', name: 'Alemão', native: 'Deutsch', hello: 'Hallo!', word: 'alemão', status: 'beta', note: 'A1–A2 · der/die/das, casos e ordem do verbo' },
 ];
 const STATUS = { live: 'Disponível', beta: 'Chegando', soon: 'Em breve' };
 const flag = code => `<svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><use href="#f-${code}"/></svg>`;
@@ -306,8 +306,8 @@ addEventListener('scroll', () => document.getElementById('topbar').classList.tog
 // Revelar ao rolar + contadores.
 const count = el => {
   const end = Number(el.dataset.count); const t0 = performance.now();
-  const step = t => { const p = Math.min(1, (t - t0) / 1400); el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3))).toLocaleString('pt-BR'); if (p < 1) requestAnimationFrame(step); };
-  reduce ? (el.textContent = end.toLocaleString('pt-BR')) : requestAnimationFrame(step);
+  const step = t => { const p = Math.min(1, (t - t0) / 1400); el.textContent = (el.dataset.prefix || '') + Math.round(end * (1 - Math.pow(1 - p, 3))).toLocaleString('pt-BR'); if (p < 1) requestAnimationFrame(step); };
+  reduce ? (el.textContent = (el.dataset.prefix || '') + end.toLocaleString('pt-BR')) : requestAnimationFrame(step);
 };
 const io = new IntersectionObserver(entries => entries.forEach(e => {
   if (!e.isIntersecting) return;
