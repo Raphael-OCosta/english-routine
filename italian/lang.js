@@ -40,7 +40,7 @@
       brand: 'Italian Routine', cheer: 'Bravissimo!', praise: 'Perfetto!', levelPrefix: 'A', levelNames: { 1: 'A1', 2: 'A2' },
       script: /[àèéìòù]|\b(il|lo|gli|sono|che|non|una|della|perché)\b/i,
     },
-    skills: { unit: 'words', unitLabel: 'parole', connectors: CONNECTORS, writePlaceholder: 'Scrivi qui in italiano…', rate: 0.9 },
+    skills: { unit: 'words', unitLabel: 'palavras', connectors: CONNECTORS, writePlaceholder: 'Scrivi qui in italiano…', rate: 0.9 },
     alphabet,
     writingChecks,
     tutorPrompt,

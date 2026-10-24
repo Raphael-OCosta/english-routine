@@ -5,6 +5,8 @@
 (() => {
   'use strict';
   const APP = window.ROUTINE_APP;
+  // Textos montados aqui passam pelo idioma da interface (public/assets/ui-language.js).
+  const t = s => window.RoutineUI?.t(s) ?? s;
   const L = APP.lang;
   const D = window.ROUTINE_DATA;
   const KEY = `routine-${L.code}-v1`;
@@ -173,7 +175,7 @@
     const multi = slots.length > 1;
     answered = false;
     picks = slots.map(() => null);
-    $('qMeta').textContent = `${D.modules[q.module]} · ${L.levelNames?.[q.level] || `${L.levelPrefix} ${q.level}`}${reviewMode ? ' · revisão' : ''}`;
+    $('qMeta').textContent = `${t(D.modules[q.module])} · ${L.levelNames?.[q.level] || `${L.levelPrefix} ${q.level}`}${reviewMode ? ` · ${t('revisão')}` : ''}`;
     $('qCount').textContent = `${index + 1} de ${round.length}`;
     $('qPrompt').textContent = q.prompt;
     const qText = $('qText');
@@ -197,7 +199,7 @@
     } else if (multi) {
       $('slots').innerHTML = slots.map((s, i) => {
         const options = shuffle([s.answers[0], ...s.distractors.slice(0, 3)]);
-        return `<div class="slot"><h3>Lacuna ${i + 1} · ${esc(s.label)}</h3><div class="slot-options">${options.map(o =>
+        return `<div class="slot"><h3>Lacuna ${i + 1} · ${esc(s.label)}</h3><div class="slot-options" data-ui-skip>${options.map(o =>
           `<button type="button" data-slot="${i}" data-value="${esc(o)}">${optionLabel(o)}</button>`).join('')}</div></div>`;
       }).join('');
     } else {
@@ -368,7 +370,7 @@
   }
 
   $('reset').addEventListener('click', () => {
-    if (!confirm(`Apagar todo o histórico do ${L.brand}? Os outros idiomas não são afetados.`)) return;
+    if (!confirm(t(`Apagar todo o histórico do ${L.brand}? Os outros idiomas não são afetados.`))) return;
     state = { ...emptyState(), goal: state.goal };
     save();
     renderProgress();

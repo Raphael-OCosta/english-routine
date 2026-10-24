@@ -42,7 +42,7 @@
       brand: 'German Routine', cheer: 'Sehr gut!', praise: 'Super!', levelPrefix: 'A', levelNames: { 1: 'A1', 2: 'A2' },
       script: /[äöüß]|\b(der|die|das|und|ist|ich|nicht|ein|eine)\b/i,
     },
-    skills: { unit: 'words', unitLabel: 'Wörter', connectors: CONNECTORS, writePlaceholder: 'Schreib hier auf Deutsch…', rate: 0.9 },
+    skills: { unit: 'words', unitLabel: 'palavras', connectors: CONNECTORS, writePlaceholder: 'Schreib hier auf Deutsch…', rate: 0.9 },
     alphabet,
     writingChecks,
     tutorPrompt,

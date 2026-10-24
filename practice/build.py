@@ -16,9 +16,18 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SKILLS = HERE.parent / "skills"
 CLOUD_SYNC_VERSION = "20261023-1"
+UI_VERSION = "20261025-1"
 
 KEYS = ("brand", "brand_word", "name", "alphabet_tab", "eyebrow", "headline", "intro", "level_prefix",
         "level1", "level2", "typing_label", "typing_hint", "html_lang")
+
+
+def ui_loader(code: str) -> str:
+    """Idioma da interface: carrega o dicionário já no <head> quando o aluno escolheu o idioma estudado."""
+    dict_tag = f'<script src="/assets/ui/{code}.js?v={UI_VERSION}"><\\/script>'
+    return (f'<script>window.ROUTINE_UI_VERSION="{UI_VERSION}";'
+            f'try{{if(localStorage.getItem("routine-ui-lang-{code}")==="{code}")document.write(\'{dict_tag}\')}}catch(e){{}}</script>'
+            f'<script src="/assets/ui-language.js?v={UI_VERSION}"></script>')
 
 
 def guard(code: str) -> str:
@@ -26,7 +35,7 @@ def guard(code: str) -> str:
             '<script>document.documentElement.dataset.cloudAuth="pending"</script>'
             '<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>'
             f'<script src="/config.js"></script><script>window.ROUTINE_LANGUAGE="{code}"</script>'
-            f'<script src="/assets/cloud-sync.js?v={CLOUD_SYNC_VERSION}"></script>')
+            f'<script src="/assets/cloud-sync.js?v={CLOUD_SYNC_VERSION}"></script>' + ui_loader(code))
 
 
 def build_app(page: dict, data: dict, out: Path) -> str:

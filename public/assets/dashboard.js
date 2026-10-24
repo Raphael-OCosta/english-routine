@@ -219,6 +219,8 @@
   const planSize = subscriber ? Math.max(1, Number(access.plan_size) || 1) : 3;
   const entitled = Array.isArray(access.languages) ? access.languages : [];
   // Teste de nível de inglês: exclusivo de quem tem acesso ao inglês.
+  const textlabBox = document.querySelector('#textlabBox');
+  if (textlabBox) textlabBox.hidden = !(access.active && entitled.includes('en'));
   const placementBox = document.querySelector('#placementBox');
   if (placementBox) {
     placementBox.hidden = !(access.active && entitled.includes('en'));

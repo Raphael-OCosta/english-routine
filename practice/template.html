@@ -14,10 +14,10 @@
   <div class="brand">{{BRAND_WORD}}<span>routine.</span></div>
   <nav role="tablist" aria-label="Seções">
     <button role="tab" data-tab="practice" aria-selected="true">Treinar</button>
-    <button role="tab" data-tab="reading" aria-selected="false">Reading</button>
-    <button role="tab" data-tab="writing" aria-selected="false">Writing</button>
-    <button role="tab" data-tab="listening" aria-selected="false">Listening</button>
-    <button role="tab" data-tab="speaking" aria-selected="false">Speaking</button>
+    <button role="tab" data-tab="reading" aria-selected="false">Leitura</button>
+    <button role="tab" data-tab="writing" aria-selected="false">Escrita</button>
+    <button role="tab" data-tab="listening" aria-selected="false">Escuta</button>
+    <button role="tab" data-tab="speaking" aria-selected="false">Fala</button>
     <button role="tab" data-tab="alphabet" aria-selected="false">{{ALPHABET_TAB}}</button>
     <button role="tab" data-tab="guide" aria-selected="false">Guia</button>
     <button role="tab" data-tab="progress" aria-selected="false">Meu progresso</button>
@@ -30,7 +30,7 @@
     <div class="intro">
       <span class="eyebrow">{{EYEBROW}}</span>
       <h1>{{HEADLINE}}</h1>
-      <p class="muted">{{COUNT}} {{INTRO}}</p>
+      <p class="muted"><span>{{COUNT}}</span> <span>{{INTRO}}</span></p>
     </div>
     <div class="layout">
       <aside class="card filters">
@@ -56,9 +56,9 @@
       <article class="card question" id="questionCard">
         <div class="row between"><span id="qMeta" class="eyebrow"></span><span id="qCount" class="small muted"></span></div>
         <p id="qPrompt" class="prompt"></p>
-        <div class="qtext-row"><p id="qText" class="qtext"></p><button id="speak" class="icon" title="Ouvir em {{NAME}}" aria-label="Ouvir em {{NAME}}">🔊</button></div>
+        <div class="qtext-row"><p id="qText" class="qtext" data-ui-skip></p><button id="speak" class="icon" title="Ouvir em {{NAME}}" aria-label="Ouvir em {{NAME}}">🔊</button></div>
         <p id="typingHint" class="small muted" hidden>{{TYPING_HINT}}</p>
-        <div id="options" class="options"></div>
+        <div id="options" class="options" data-ui-skip></div>
         <div id="slots" class="slots"></div>
         <div id="typing" class="typing" hidden><input id="typed" lang="{{HTML_LANG}}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Digite a resposta"></div>
         <button id="check" class="primary" hidden>Corrigir</button>
@@ -94,12 +94,12 @@
       <div class="card stat"><span>Para revisar</span><strong id="sWrong">0</strong></div>
     </div>
     <div class="card"><h2>Por conteúdo</h2><table class="table"><thead><tr><th>Conteúdo</th><th>Respondidas</th><th>Acertos</th></tr></thead><tbody id="byModule"></tbody></table></div>
-    <div class="card"><h2>Reading, Writing, Listening e Speaking</h2><div id="skillsHistory"></div></div>
+    <div class="card"><h2>Leitura, escrita, escuta e fala</h2><div id="skillsHistory"></div></div>
     <div class="card"><h2>Últimos erros</h2><div id="lastWrong"></div></div>
     <div class="card danger"><h2>Reiniciar histórico</h2><p class="muted small">Apaga as respostas e os treinos de habilidades do {{BRAND}} em todos os seus aparelhos. Não afeta os outros idiomas.</p><button id="reset">Reiniciar histórico do {{NAME}}</button></div>
   </section>
 </main>
-<footer class="footer">{{BRAND}} · parte do English Routine · <a href="/dashboard.html">Minha conta</a></footer>
+<footer class="footer"><span>{{BRAND}}</span> · <span>parte do English Routine</span> · <a href="/dashboard.html">Minha conta</a></footer>
 <script>{{SKILLS}}</script>
 <script>{{DATA}}</script>
 <script>{{LANG_JS}}</script>

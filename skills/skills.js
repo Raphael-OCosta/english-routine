@@ -126,7 +126,7 @@
 
     // ---------------------------------------------------------------- reading
     $('reading').innerHTML = `
-      <div class="skill-heading"><span class="eyebrow">01 · Reading</span><h2>Leia no seu ritmo. Depois confira.</h2>
+      <div class="skill-heading"><span class="eyebrow">01 · Leitura</span><h2>Leia no seu ritmo. Depois confira.</h2>
       <p class="muted">Textos originais por nível. O cronômetro mede ${esc(unitLabel)} por minuto; pausas não contam. Depois da leitura, responda às perguntas e, se quiser, veja a pronúncia e a tradução.</p></div>
       <div class="card">
         <div class="skill-filters"><div><label for="${tag}ReadLevel">Nível</label><select id="${tag}ReadLevel">${levelOptions}</select></div>
@@ -258,7 +258,7 @@
 
     // ---------------------------------------------------------------- writing
     $('writing').innerHTML = `
-      <div class="skill-heading"><span class="eyebrow">02 · Writing</span><h2>Escreva em ${esc(L.name)}.</h2>
+      <div class="skill-heading"><span class="eyebrow">02 · Escrita</span><h2>Escreva em ${esc(L.name)}.</h2>
       <p class="muted">Rascunho salvo automaticamente. A revisão local dá pistas objetivas; para uma correção completa, use o pedido pronto para o chat.</p></div>
       <div class="card">
         <label for="${tag}WritePick">Proposta de escrita · nível e tema</label><select id="${tag}WritePick">${options(prompts)}</select>
@@ -346,7 +346,7 @@
 
     // ---------------------------------------------------------------- listening
     $('listening').innerHTML = `
-      <div class="skill-heading"><span class="eyebrow">03 · Listening</span><h2>Primeiro escute. Depois confira.</h2>
+      <div class="skill-heading"><span class="eyebrow">03 · Escuta</span><h2>Primeiro escute. Depois confira.</h2>
       <p class="muted">Áudio narrado pela voz em ${esc(L.name)} do seu aparelho. Ao compartilhar a tela, inclua o som do computador para os outros ouvirem.</p></div>
       <div class="card">
         <div class="skill-filters"><div><label for="${tag}ListenVoice">Voz em ${esc(L.name)}</label><select id="${tag}ListenVoice"></select></div>
@@ -356,7 +356,7 @@
         <p class="small muted">Ouça a frase e escolha exatamente o que foi dito. As opções mudam só num ponto: partícula, tempo verbal ou terminação. Rodadas de ${LISTEN_CHOICE_ROUND}; o resultado entra no histórico.</p>
         <div class="row"><button id="${tag}LcPlay" class="primary">🔊 Ouvir frase</button><button id="${tag}LcSlow">Ouvir devagar</button><span id="${tag}LcCount" class="small muted"></span></div>
         <p id="${tag}LcStatus" class="small muted" role="status"></p>
-        <div id="${tag}LcOptions" class="lc-options" lang="${L.html}"></div><div id="${tag}LcFeedback"></div>
+        <div id="${tag}LcOptions" class="lc-options" lang="${L.html}" data-ui-skip></div><div id="${tag}LcFeedback"></div>
         <div class="row"><button id="${tag}LcNext" class="primary" hidden>Próxima frase →</button></div>
       </div>
       <div class="card"><h3>Escute um texto</h3>
@@ -365,7 +365,7 @@
         <p id="${tag}ListenStatus" role="status"></p>
         <details id="${tag}ListenTranscript"><summary>Mostrar transcrição · apoio opcional</summary><div id="${tag}ListenText" class="passage" lang="${L.html}"></div><div id="${tag}ListenSupport"></div></details>
         <div id="${tag}ListenQuestions" class="quiz"></div>
-        <button id="${tag}ListenCheck" class="primary">Corrigir e registrar listening</button>
+        <button id="${tag}ListenCheck" class="primary">Corrigir e registrar escuta</button>
         <div id="${tag}ListenResult" role="status"></div>
       </div>`;
     let listenPlayed = false;
@@ -458,7 +458,7 @@
 
     // ---------------------------------------------------------------- speaking
     $('speaking').innerHTML = `
-      <div class="skill-heading"><span class="eyebrow">04 · Speaking</span><h2>Uma ideia. Sua voz. Mais confiança.</h2>
+      <div class="skill-heading"><span class="eyebrow">04 · Fala</span><h2>Uma ideia. Sua voz. Mais confiança.</h2>
       <p class="muted">Prepare palavras-chave por 30 segundos. Fale por 1 a 2 minutos, escute sua gravação e escolha um ponto para melhorar.</p></div>
       <div class="card">
         <label for="${tag}SpeakPick">Tema para falar</label><select id="${tag}SpeakPick">${options(prompts)}</select>
@@ -638,6 +638,7 @@
       if (!box) return;
       const events = S().events;
       const kinds = ['reading', 'writing', 'listening', 'speaking'];
+      const KIND = { reading: 'Leitura', writing: 'Escrita', listening: 'Escuta', speaking: 'Fala' };
       const reads = events.filter(e => e.kind === 'reading').slice(-5);
       const avg = reads.length ? Math.round(reads.reduce((n, e) => n + e.wpm, 0) / reads.length) : 0;
       const detail = e => e.kind === 'reading' ? `${e.wpm} ${unitLabel}/min · ${timeLabel(e.seconds * 1000)} · compreensão ${e.score}/${e.total}${e.reread ? ' · releitura' : ''}`
@@ -645,9 +646,9 @@
           : e.kind === 'listening' ? `${e.score}/${e.total}${e.transcript ? ' · com transcrição' : ''}`
             : `${timeLabel(e.seconds * 1000)} · autoavaliação ${(e.checks || []).filter(Boolean).length}/3 · ${e.mode}${Number.isFinite(e.intelligibility) ? ` · inteligibilidade ${e.intelligibility}%` : ''}`;
       const title = e => [...texts, ...prompts].find(p => p.id === e.ref)?.title || prompts.find(p => p.id === e.ref)?.prompt_pt || e.title || e.ref;
-      box.innerHTML = `<div class="skill-summary">${kinds.map(k => `<div><span>${k[0].toUpperCase() + k.slice(1)}</span><strong>${events.filter(e => e.kind === k).length}</strong><small>treinos</small></div>`).join('')}</div>`
-        + `<p class="small muted">${reads.length ? `Reading: média das últimas ${reads.length} leituras = ${avg} ${unitLabel}/min.` : 'Registre leituras para acompanhar sua velocidade e compreensão.'}</p>`
-        + (events.slice(-30).reverse().map(e => `<details><summary>${esc(e.day)} · ${esc(e.kind)} · ${esc(e.level)} · ${esc(detail(e))}</summary><p>${esc(title(e))}</p>${e.text ? `<pre class="saved-writing" lang="${L.html}">${esc(e.text)}</pre>` : ''}${e.speechText ? `<p lang="${L.html}">${esc(e.speechText)}</p>` : ''}${e.notes ? `<p>${esc(e.notes)}</p>` : ''}</details>`).join('')
+      box.innerHTML = `<div class="skill-summary">${kinds.map(k => `<div><span>${KIND[k]}</span><strong>${events.filter(e => e.kind === k).length}</strong><small>treinos</small></div>`).join('')}</div>`
+        + `<p class="small muted">${reads.length ? `Leitura: média das últimas ${reads.length} leituras = ${avg} ${unitLabel}/min.` : 'Registre leituras para acompanhar sua velocidade e compreensão.'}</p>`
+        + (events.slice(-30).reverse().map(e => `<details><summary>${esc(e.day)} · ${KIND[e.kind] || esc(e.kind)} · ${esc(e.level)} · ${esc(detail(e))}</summary><p>${esc(title(e))}</p>${e.text ? `<pre class="saved-writing" lang="${L.html}">${esc(e.text)}</pre>` : ''}${e.speechText ? `<p lang="${L.html}">${esc(e.speechText)}</p>` : ''}${e.notes ? `<p>${esc(e.notes)}</p>` : ''}</details>`).join('')
           || '<p class="muted">Nenhum treino de habilidades registrado ainda.</p>');
     }
 

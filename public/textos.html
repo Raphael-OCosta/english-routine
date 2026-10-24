@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Textos por gramática · English Routine</title>
+<meta name="description" content="Monte textos em inglês com as estruturas gramaticais que você escolher, com exercício de lacunas e gabarito.">
+<style>html[data-cloud-auth="pending"] body{visibility:hidden}</style>
+<script>document.documentElement.dataset.cloudAuth="pending"</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/assets/require-access.js" data-lang="en"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0f1b33;--muted:#5b6b86;--paper:#f7f8fc;--card:#fff;--line:#e3e7f1;--brand:#013473;--accent:#e2475f;--gold:#f5b83d;--shadow:0 20px 50px -20px #0b234d40}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.6 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper)}
+a{color:inherit}
+.top{background:radial-gradient(900px 400px at 85% -20%,#2563eb,transparent 60%),linear-gradient(160deg,#061532,#0b2a63);color:#fff;padding:18px 20px 110px}
+.top .bar{max-width:1180px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-size:22px;font-weight:800;letter-spacing:-1px;text-decoration:none}.brand span{color:var(--accent)}
+.top nav{display:flex;gap:16px;flex-wrap:wrap}.top nav a{color:#cdd8f5;font-weight:600;text-decoration:none}
+.hero{max-width:1180px;margin:34px auto 0}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent)}
+.hero .eyebrow{color:#ffb3c0}
+h1{font-size:clamp(30px,4.6vw,48px);line-height:1.08;letter-spacing:-1.2px;margin:8px 0 10px}
+.hero p{max-width:720px;color:#cdd8f5;margin:0}
+main{max-width:1180px;margin:-80px auto 40px;padding:0 16px;display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start}
+@media (max-width:920px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:22px}
+h2{font-size:15px;margin:18px 0 8px;letter-spacing:-.2px}
+h2:first-child{margin-top:0}
+.muted{color:var(--muted)}.small{font-size:13.5px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0}
+.chip span{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s}
+.chip span i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.chip input:checked+span{background:color-mix(in srgb,var(--c) 14%,#fff);border-color:var(--c);color:var(--ink)}
+.chip input:focus-visible+span{outline:3px solid #2563eb55}
+.group{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
+select{width:100%;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.checks label{display:inline-flex;gap:6px;align-items:center;margin-right:14px;font-size:14px}
+.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 22px;font:inherit;font-weight:700;background:var(--accent);color:#fff;cursor:pointer;box-shadow:0 12px 30px -12px var(--accent)}
+.button.dark{background:var(--brand);box-shadow:0 12px 30px -12px var(--brand)}
+.button.light{background:#eef1f8;color:var(--ink);box-shadow:none}
+.button.small{padding:8px 14px;font-size:13.5px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.tabs{display:flex;gap:6px;background:#eef1f8;padding:5px;border-radius:999px;width:max-content;max-width:100%;overflow:auto}
+.tabs button{border:0;background:transparent;border-radius:999px;padding:8px 16px;font:inherit;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer}
+.tabs button[aria-selected=true]{background:#fff;color:var(--ink);box-shadow:0 4px 12px -6px #0b234d55}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.doc h3{font-size:clamp(22px,3vw,28px);letter-spacing:-.6px;margin:6px 0 4px}
+.doc .meta{font-size:13px;color:var(--muted);margin-bottom:14px}
+.doc p.par{font-size:18px;line-height:1.85;margin:0 0 14px}
+.hl .t{background:color-mix(in srgb,var(--c) 18%,transparent);border-bottom:2px solid var(--c);border-radius:4px;padding:0 2px}
+.gap{display:inline-block;min-width:92px;border-bottom:2px solid var(--ink);text-align:center;color:var(--muted);font-size:12px;line-height:1.2;vertical-align:baseline}
+.hint{color:var(--brand);font-size:14px;font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 16px}
+.legend span{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;background:#f3f5fb;border-radius:999px;padding:4px 10px}
+.legend i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+ol.key{columns:2;column-gap:28px;padding-left:22px}
+ol.key li{break-inside:avoid;margin-bottom:6px}
+ol.key b{color:var(--brand)}
+.empty{padding:40px 10px;text-align:center;color:var(--muted)}
+.notice{background:#fff7e6;border:1px solid #f5d38a;border-radius:14px;padding:10px 14px;font-size:14px}
+#status{min-height:1.4em}
+@media print{
+  .top,.controls,.toolbar,.tabs,.no-print{display:none!important}
+  body{background:#fff}
+  main{display:block;margin:0;padding:0}
+  .card{box-shadow:none;border:0;padding:0}
+  .print-all [data-panel]{display:block!important;margin-bottom:24px}
+  .print-all [data-panel=key]{break-before:page}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="bar"><a class="brand" href="/dashboard.html">english<span>routine.</span></a>
+    <nav><a href="/app.html">Treinar</a><a href="/dashboard.html">Minha conta</a></nav></div>
+  <div class="hero"><span class="eyebrow">Para professores e alunos</span>
+    <h1>Textos por gramática</h1>
+    <p>Escolha as estruturas que quer trabalhar, combine com um tema e com afirmativas, negativas ou perguntas. O texto sai com as estruturas destacadas, um exercício de lacunas e o gabarito, prontos para imprimir.</p></div>
+</header>
+<main>
+  <aside class="card controls" aria-label="Montar texto">
+    <h2>1. Estruturas</h2>
+    <p class="small muted" style="margin:0 0 6px">Marque uma ou várias. O texto usa só as estruturas marcadas, em rodízio.</p>
+    <div id="grammar"></div>
+    <h2>2. Tema</h2>
+    <select id="story"></select>
+    <h2>3. Forma das frases</h2>
+    <div class="checks" id="forms"></div>
+    <h2>4. Tamanho e ligação</h2>
+    <div class="row"><select id="size" style="width:auto"><option value="6">6 frases</option><option value="9">9 frases</option><option value="12" selected>12 frases</option></select>
+      <label class="small"><input type="checkbox" id="connectors" checked> Conectores (then, after that…)</label></div>
+    <div class="actions"><button class="button" id="generate">Gerar texto</button><button class="button light" id="another">Outra versão</button></div>
+    <p id="status" class="small muted" role="status"></p>
+  </aside>
+  <section class="card" aria-live="polite">
+    <div class="toolbar">
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="text">Texto</button>
+        <button role="tab" aria-selected="false" data-tab="exercise">Exercício</button>
+        <button role="tab" aria-selected="false" data-tab="key">Gabarito</button>
+      </div>
+      <div class="row no-print">
+        <label class="small" id="hlWrap"><input type="checkbox" id="highlight" checked> Destacar estruturas</label>
+        <select id="hint" class="small" style="width:auto;display:none" aria-label="Dica nas lacunas"><option value="verb">Dica: verbo base</option><option value="both">Dica: verbo + estrutura</option><option value="none">Sem dica</option></select>
+        <button class="button light small" id="copy">Copiar</button>
+        <button class="button dark small" id="print">Imprimir</button>
+      </div>
+    </div>
+    <div id="out" class="doc"><p class="empty">Escolha as estruturas e clique em <b>Gerar texto</b>.</p></div>
+  </section>
+</main>
+<script src="/assets/textlab/engine.js?v=20261025-1"></script>
+<script src="/assets/textlab/stories_en.js?v=20261025-1"></script>
+<script src="/assets/textlab/page.js?v=20261025-1"></script>
+</body>
+</html>
