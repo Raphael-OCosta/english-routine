@@ -252,7 +252,8 @@
     const action = has
       ? `<a class="button" href="${escapeHtml(lang.app)}">${lang.available ? 'Treinar' : 'Testar'}</a>`
       : `<span class="badge">${status}</span>`;
-    return `<div class="language-item"><label>${box}<span>${escapeHtml(lang.brand)}<small>${escapeHtml(lang.name)} · ${detail}</small></span></label>${action}</div>`;
+    const flag = `<div class="flag"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><use href="#f-${code}"/></svg></div>`;
+    return `<div class="language-item${has ? ' has' : ''}${lang.available ? '' : ' soon'}">${flag}<label>${box}<span>${escapeHtml(lang.brand)}<small>${escapeHtml(lang.name)} · ${detail}</small></span></label>${action}</div>`;
   }).join('');
 
   const checked = () => [...languageList.querySelectorAll('input[data-language]:checked')].map(input => input.dataset.language);
