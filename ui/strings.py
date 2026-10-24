@@ -376,3 +376,10 @@ PROMPTS = {
         ],
     },
 }
+
+# Demais idiomas (ui/prompts_more.py).
+import prompts_more as _more  # noqa: E402
+
+PROMPTS.update(_more.PROMPTS)
+for _code, _items in _more.TYPING.items():
+    EXTRA[_code].update(_items)

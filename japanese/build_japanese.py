@@ -125,7 +125,7 @@ def build():
                  ("昨日", forms["ました"], f"Passado de {dic} ({pt}).", "Ontem (昨日) → radical + ました."),
                  ("明日は", forms["ません"], f"Negativo de {dic} ({pt}): “não vou …”.", "Negativo educado → radical + ません."),
                  ("昨日は", forms["ませんでした"], f"Passado negativo de {dic} ({pt}).", "Passado negativo → radical + ませんでした."),
-                 ("今度", forms["たい"], f"Diga “quero {pt}”.", "Querer → radical + たいです.")]
+                 ("今度", forms["たい"], f"Diga “quero {pt}” ({dic}).", "Querer → radical + たいです.")]
         for time, right, prompt, why in cases:
             text = f"{time}{comp}___。"
             add("jg", "verbos", level if time in ("毎日", "昨日") else 2, "verbos", prompt, text, accept(right), [f for f in all_forms if f != right] + [dic],

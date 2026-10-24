@@ -30,6 +30,22 @@ def ui_loader(code: str) -> str:
             f'<script src="/assets/ui-language.js?v={UI_VERSION}"></script>')
 
 
+# Fonte com os caracteres do idioma (a Plus Jakarta Sans só cobre o alfabeto latino).
+CJK_FONTS = {"ko": "Noto Sans KR", "ja": "Noto Sans JP", "zh": "Noto Sans SC"}
+
+
+def fonts(code: str) -> str:
+    families = "family=Plus+Jakarta+Sans:wght@400;500;600;700;800"
+    cjk = CJK_FONTS.get(code)
+    if not cjk:
+        return f'<link href="https://fonts.googleapis.com/css2?{families}&display=swap" rel="stylesheet">'
+    families += f"&family={cjk.replace(' ', '+')}:wght@400;500;700"
+    return (f'<link href="https://fonts.googleapis.com/css2?{families}&display=swap" rel="stylesheet">'
+            f'<style>html body,html button,html input,html select,html textarea{{font-family:"Plus Jakarta Sans","{cjk}",system-ui,sans-serif}}'
+            f':lang({code}){{font-family:"{cjk}","Plus Jakarta Sans",sans-serif;letter-spacing:0!important;word-break:keep-all}}'
+            f'html h1,html h2,html .qtext,html .brand{{letter-spacing:-.2px}}</style>')
+
+
 def guard(code: str) -> str:
     return ('<style>html[data-cloud-auth="pending"] body{visibility:hidden}</style>'
             '<script>document.documentElement.dataset.cloudAuth="pending"</script>'
@@ -51,6 +67,7 @@ def build_app(page: dict, data: dict, out: Path) -> str:
             .replace("{{LANG_JS}}", Path(page["lang_js"]).read_text(encoding="utf-8"))
             .replace("{{APP}}", (HERE / "practice.js").read_text(encoding="utf-8"))
             .replace("{{ALPHABET_SECTION}}", Path(page["alphabet_html"]).read_text(encoding="utf-8"))
+            .replace("{{FONTS}}", fonts(page["code"]))
             .replace("{{COUNT}}", f"{len(data['questions']):,}".replace(",", ".")))
     for key in KEYS:
         html = html.replace("{{" + key.upper() + "}}", page[key])

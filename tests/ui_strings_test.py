@@ -64,7 +64,7 @@ sys.path.insert(0, str(ROOT / "ui"))
 import build_ui  # noqa: E402
 import json  # noqa: E402
 
-for code, folder in (("ko", "korean"),):
+for code, folder in (("ko", "korean"), ("zh", "chinese"), ("ja", "japanese"), ("es", "spanish"), ("fr", "french"), ("it", "italian"), ("de", "german")):
     table = build_ui.language(code)
     html = (ROOT / "public" / f"{folder}.html").read_text(encoding="utf-8")
     start = html.index("window.ROUTINE_DATA = ") + len("window.ROUTINE_DATA = ")
