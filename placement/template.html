@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0f1b33;--muted:#5b6b86;--paper:#f7f8fc;--card:#fff;--line:#e3e7f1;--brand:#013473;--accent:#e2475f;--gold:#f5b83d;--mint:#18b38a;--shadow:0 20px 50px -20px #0b234d40}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.6 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper)}
+a{color:inherit}
+.top{background:radial-gradient(900px 400px at 85% -20%,#2563eb,transparent 60%),linear-gradient(160deg,#061532,#0b2a63);color:#fff;padding:18px 20px 90px}
+.top .bar{max-width:880px;margin:auto;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:22px;font-weight:800;letter-spacing:-1px;text-decoration:none}.brand span{color:var(--accent)}
+.top .bar a.link{color:#cdd8f5;font-weight:600;text-decoration:none}
+main{max-width:880px;margin:-70px auto 40px;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:30px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(28px,4.5vw,42px);line-height:1.1;letter-spacing:-1px;margin:8px 0 12px}
+.muted{color:var(--muted)}.small{font-size:14px}
+.button{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:14px 26px;font:inherit;font-weight:700;background:var(--accent);color:#fff;cursor:pointer;box-shadow:0 12px 30px -12px var(--accent);transition:transform .2s;text-decoration:none}
+.button:hover{transform:translateY(-2px)}
+.button.dark{background:var(--brand);box-shadow:0 12px 30px -12px var(--brand)}
+.button.light{background:#eef1f8;color:var(--ink);box-shadow:none}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}
+.facts div{background:var(--paper);border-radius:16px;padding:14px;text-align:center}.facts b{display:block;font-size:22px;color:var(--brand)}
+@media (max-width:640px){.facts{grid-template-columns:repeat(2,1fr)}}
+ul.tips{padding-left:20px;color:var(--muted)}
+.progress{height:8px;background:#eef1f8;border-radius:99px;overflow:hidden;margin:6px 0 18px}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .5s}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.type{font-size:12px;font-weight:800;border-radius:999px;padding:4px 10px;background:#eef3ff;color:var(--brand)}
+.passage{background:var(--paper);border-left:4px solid var(--brand);border-radius:12px;padding:14px 16px;margin:16px 0;font-size:16px}
+.audio{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0}
+.stem{font-size:clamp(20px,3vw,26px);font-weight:700;margin:14px 0 18px;line-height:1.35}
+.blank{display:inline-block;min-width:80px;border-bottom:3px solid var(--accent)}
+.options{display:grid;gap:10px}
+.options button{text-align:left;font:inherit;font-size:17px;font-weight:600;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;transition:all .2s}
+.options button:hover{border-color:var(--brand);transform:translateX(4px)}
+.options button.picked{background:var(--brand);color:#fff;border-color:var(--brand)}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px;flex-wrap:wrap}
+.anim{animation:slide .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes slide{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.result-top{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center}
+.badge{width:150px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent),var(--gold),var(--mint),var(--accent));animation:spinIn 1s cubic-bezier(.2,.8,.2,1)}
+.badge b{width:118px;aspect-ratio:1;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:44px;color:var(--brand)}
+@keyframes spinIn{from{transform:scale(.4) rotate(-180deg);opacity:0}to{transform:none;opacity:1}}
+@media (max-width:640px){.result-top{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.scale{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.scale span{padding:6px 12px;border-radius:10px;background:#eef1f8;font-weight:800;color:var(--muted)}
+.scale span.on{background:var(--accent);color:#fff;transform:scale(1.1)}
+.bar{display:grid;grid-template-columns:170px 1fr 50px;gap:10px;align-items:center;margin:8px 0}
+.bar div{height:10px;background:#eef1f8;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:var(--w);background:var(--mint);animation:grow 1s ease-out}
+@keyframes grow{from{width:0}}
+@media (max-width:640px){.bar{grid-template-columns:1fr 2fr 44px}}
+.plan{background:var(--paper);border-radius:16px;padding:16px 20px}
+details{border-top:1px solid var(--line);padding:10px 0}summary{cursor:pointer;font-weight:600}summary small{color:var(--muted)}
+.footer{text-align:center;color:var(--muted);font-size:13px;padding:20px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="bar"><a class="brand" href="/">english<span>routine.</span></a><a class="link" href="/login.html">Entrar</a></div></header>
+<main>
+  <section id="intro" class="card anim">
+    <span class="eyebrow">{{EYEBROW}}</span>
+    <h1>{{HEADLINE}}</h1>
+    <p class="muted">{{INTRO}}</p>
+    <div class="facts"><div><b>{{TOTAL}}</b>questões</div><div><b>~15</b>minutos</div><div><b>{{LEVELS}}</b>níveis CEFR</div><div><b>Grátis</b>sem cadastro</div></div>
+    <ul class="tips">
+      <li>As perguntas se adaptam: ficam mais difíceis quando você acerta e mais fáceis quando erra.</li>
+      <li>Ative o som: há questões de escuta (cada áudio pode ser ouvido 2 vezes).</li>
+      <li>Não use tradutor nem dicionário. Se não souber, clique em “Não sei”, que é melhor que chutar.</li>
+      <li>Resultado aproximado, para orientar seus estudos. Não é uma certificação.</li>
+    </ul>
+    <p id="pLast" class="small muted"></p>
+    <button id="pStart" class="button">Começar o teste →</button>
+  </section>
+
+  <section id="test" class="card" hidden>
+    <div class="qhead"><span id="pCount" class="small muted"></span><span id="pType" class="type"></span></div>
+    <div class="progress"><i id="pProgress"></i></div>
+    <div id="pPassage" class="passage" lang="{{LANG}}" hidden></div>
+    <div id="pAudio" class="audio" hidden><button id="pPlay" class="button dark">🔊 Ouvir áudio</button><span id="pAudioStatus" class="small muted"></span></div>
+    <div id="pStem" class="stem" lang="{{LANG}}"></div>
+    <div id="pOptions" class="options"></div>
+    <div class="foot"><span class="small muted">Sem volta: a próxima pergunta depende desta resposta.</span><button id="pSkip" class="button light">Não sei</button></div>
+  </section>
+
+  <section id="result" class="card" hidden>
+    <div class="result-top">
+      <div class="badge"><b id="rLevel">B1</b></div>
+      <div><span class="eyebrow">Seu nível estimado</span><h1 id="rTitle"></h1><p id="rDesc" class="muted"></p>
+        <p class="small"><b id="rScore"></b> · <span id="rRange"></span></p></div>
+    </div>
+    <div id="rLevels" class="scale"></div>
+    <h3>Desempenho por tipo de questão</h3>
+    <div id="rSkills"></div>
+    <h3>Seu plano no {{BRAND}}</h3>
+    <ul id="rPlan" class="plan"></ul>
+    <div class="foot"><a class="button" href="/login.html?mode=signup">Criar conta e começar</a><button id="rAgain" class="button light">Refazer o teste</button></div>
+    <h3>Revisar respostas</h3>
+    <div id="rReview"></div>
+  </section>
+</main>
+<p class="footer">Teste aproximado, inspirado na escala do Quadro Europeu Comum de Referência (CEFR). Não substitui exames oficiais. · <a href="/privacidade.html">Privacidade</a></p>
+<script>{{ENGINE}}</script>
+<script>
+const PLACEMENT = {{CONFIG}};
+RoutinePlacement.start({ ...PLACEMENT, voice: new RegExp(PLACEMENT.voice, 'i') });
+</script>
+</body>
+</html>

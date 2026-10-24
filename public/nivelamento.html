@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste de nível de inglês grátis · English Routine</title>
+<meta name="description" content="Descubra seu nível de inglês (A1 a C2) em cerca de 15 minutos com um teste adaptativo gratuito.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0f1b33;--muted:#5b6b86;--paper:#f7f8fc;--card:#fff;--line:#e3e7f1;--brand:#013473;--accent:#e2475f;--gold:#f5b83d;--mint:#18b38a;--shadow:0 20px 50px -20px #0b234d40}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.6 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper)}
+a{color:inherit}
+.top{background:radial-gradient(900px 400px at 85% -20%,#2563eb,transparent 60%),linear-gradient(160deg,#061532,#0b2a63);color:#fff;padding:18px 20px 90px}
+.top .bar{max-width:880px;margin:auto;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:22px;font-weight:800;letter-spacing:-1px;text-decoration:none}.brand span{color:var(--accent)}
+.top .bar a.link{color:#cdd8f5;font-weight:600;text-decoration:none}
+main{max-width:880px;margin:-70px auto 40px;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:30px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(28px,4.5vw,42px);line-height:1.1;letter-spacing:-1px;margin:8px 0 12px}
+.muted{color:var(--muted)}.small{font-size:14px}
+.button{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:14px 26px;font:inherit;font-weight:700;background:var(--accent);color:#fff;cursor:pointer;box-shadow:0 12px 30px -12px var(--accent);transition:transform .2s;text-decoration:none}
+.button:hover{transform:translateY(-2px)}
+.button.dark{background:var(--brand);box-shadow:0 12px 30px -12px var(--brand)}
+.button.light{background:#eef1f8;color:var(--ink);box-shadow:none}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}
+.facts div{background:var(--paper);border-radius:16px;padding:14px;text-align:center}.facts b{display:block;font-size:22px;color:var(--brand)}
+@media (max-width:640px){.facts{grid-template-columns:repeat(2,1fr)}}
+ul.tips{padding-left:20px;color:var(--muted)}
+.progress{height:8px;background:#eef1f8;border-radius:99px;overflow:hidden;margin:6px 0 18px}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .5s}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.type{font-size:12px;font-weight:800;border-radius:999px;padding:4px 10px;background:#eef3ff;color:var(--brand)}
+.passage{background:var(--paper);border-left:4px solid var(--brand);border-radius:12px;padding:14px 16px;margin:16px 0;font-size:16px}
+.audio{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0}
+.stem{font-size:clamp(20px,3vw,26px);font-weight:700;margin:14px 0 18px;line-height:1.35}
+.blank{display:inline-block;min-width:80px;border-bottom:3px solid var(--accent)}
+.options{display:grid;gap:10px}
+.options button{text-align:left;font:inherit;font-size:17px;font-weight:600;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;transition:all .2s}
+.options button:hover{border-color:var(--brand);transform:translateX(4px)}
+.options button.picked{background:var(--brand);color:#fff;border-color:var(--brand)}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px;flex-wrap:wrap}
+.anim{animation:slide .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes slide{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.result-top{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center}
+.badge{width:150px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent),var(--gold),var(--mint),var(--accent));animation:spinIn 1s cubic-bezier(.2,.8,.2,1)}
+.badge b{width:118px;aspect-ratio:1;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:44px;color:var(--brand)}
+@keyframes spinIn{from{transform:scale(.4) rotate(-180deg);opacity:0}to{transform:none;opacity:1}}
+@media (max-width:640px){.result-top{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.scale{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.scale span{padding:6px 12px;border-radius:10px;background:#eef1f8;font-weight:800;color:var(--muted)}
+.scale span.on{background:var(--accent);color:#fff;transform:scale(1.1)}
+.bar{display:grid;grid-template-columns:170px 1fr 50px;gap:10px;align-items:center;margin:8px 0}
+.bar div{height:10px;background:#eef1f8;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:var(--w);background:var(--mint);animation:grow 1s ease-out}
+@keyframes grow{from{width:0}}
+@media (max-width:640px){.bar{grid-template-columns:1fr 2fr 44px}}
+.plan{background:var(--paper);border-radius:16px;padding:16px 20px}
+details{border-top:1px solid var(--line);padding:10px 0}summary{cursor:pointer;font-weight:600}summary small{color:var(--muted)}
+.footer{text-align:center;color:var(--muted);font-size:13px;padding:20px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="bar"><a class="brand" href="/">english<span>routine.</span></a><a class="link" href="/login.html">Entrar</a></div></header>
+<main>
+  <section id="intro" class="card anim">
+    <span class="eyebrow">Teste de nível · inglês</span>
+    <h1>Descubra seu nível de inglês.</h1>
+    <p class="muted">Um teste adaptativo de gramática, vocabulário, leitura e escuta. Em cerca de 15 minutos você recebe uma estimativa na escala CEFR (A1 a C2) e um plano de treino.</p>
+    <div class="facts"><div><b>30</b>questões</div><div><b>~15</b>minutos</div><div><b>6</b>níveis CEFR</div><div><b>Grátis</b>sem cadastro</div></div>
+    <ul class="tips">
+      <li>As perguntas se adaptam: ficam mais difíceis quando você acerta e mais fáceis quando erra.</li>
+      <li>Ative o som: há questões de escuta (cada áudio pode ser ouvido 2 vezes).</li>
+      <li>Não use tradutor nem dicionário. Se não souber, clique em “Não sei”, que é melhor que chutar.</li>
+      <li>Resultado aproximado, para orientar seus estudos. Não é uma certificação.</li>
+    </ul>
+    <p id="pLast" class="small muted"></p>
+    <button id="pStart" class="button">Começar o teste →</button>
+  </section>
+
+  <section id="test" class="card" hidden>
+    <div class="qhead"><span id="pCount" class="small muted"></span><span id="pType" class="type"></span></div>
+    <div class="progress"><i id="pProgress"></i></div>
+    <div id="pPassage" class="passage" lang="en" hidden></div>
+    <div id="pAudio" class="audio" hidden><button id="pPlay" class="button dark">🔊 Ouvir áudio</button><span id="pAudioStatus" class="small muted"></span></div>
+    <div id="pStem" class="stem" lang="en"></div>
+    <div id="pOptions" class="options"></div>
+    <div class="foot"><span class="small muted">Sem volta: a próxima pergunta depende desta resposta.</span><button id="pSkip" class="button light">Não sei</button></div>
+  </section>
+
+  <section id="result" class="card" hidden>
+    <div class="result-top">
+      <div class="badge"><b id="rLevel">B1</b></div>
+      <div><span class="eyebrow">Seu nível estimado</span><h1 id="rTitle"></h1><p id="rDesc" class="muted"></p>
+        <p class="small"><b id="rScore"></b> · <span id="rRange"></span></p></div>
+    </div>
+    <div id="rLevels" class="scale"></div>
+    <h3>Desempenho por tipo de questão</h3>
+    <div id="rSkills"></div>
+    <h3>Seu plano no English Routine</h3>
+    <ul id="rPlan" class="plan"></ul>
+    <div class="foot"><a class="button" href="/login.html?mode=signup">Criar conta e começar</a><button id="rAgain" class="button light">Refazer o teste</button></div>
+    <h3>Revisar respostas</h3>
+    <div id="rReview"></div>
+  </section>
+</main>
+<p class="footer">Teste aproximado, inspirado na escala do Quadro Europeu Comum de Referência (CEFR). Não substitui exames oficiais. · <a href="/privacidade.html">Privacidade</a></p>
+<script>/* Routine Placement — teste de nivelamento adaptativo, comum a todos os idiomas.
+ *
+ * Modelo: cada item tem dificuldade b pela sua faixa (A1 … C2). A cada resposta a
+ * habilidade θ é reestimada por EAP (média a posteriori numa grade) com o modelo
+ * logístico de 3 parâmetros (chute c = 1/opções). O próximo item é o mais informativo
+ * perto de θ, respeitando a cota de cada tipo (gramática/vocabulário, leitura, escuta).
+ * Resultado aproximado, sem valor de certificação. Contrato em docs/PADRAO-IDIOMAS.md.
+ */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const GRID = Array.from({ length: 161 }, (_, i) => -4 + i * 0.05);
+  const D = 1.7;
+
+  // Sessão sem tela: usada pela página e pelos testes de simulação.
+  function createSession(cfg) {
+    const levels = cfg.levels;                // [{code:'A1', b:-2.5, min, title, description, plan}]
+    const bOf = Object.fromEntries(levels.map(l => [l.code, l.b]));
+    const bank = cfg.bank.map((q, i) => ({ ...q, id: i, b: bOf[q.level] + (((i * 37) % 7) - 3) * 0.06 }));
+    const quota = { ...cfg.quota };           // {grammar: 18, reading: 6, listening: 6}
+    const total = Object.values(quota).reduce((a, b) => a + b, 0);
+    const typeOf = q => (q.type === 'vocab' ? 'grammar' : q.type);
+    const prior = GRID.map(t => Math.exp(-(t * t) / (2 * 1.6 * 1.6)));
+    const answers = [];
+    const p = (theta, q) => { const c = 1 / q.options.length; return c + (1 - c) / (1 + Math.exp(-D * (theta - q.b))); };
+    function estimate() {
+      const post = GRID.map((t, k) => answers.reduce((acc, a) => acc * (a.correct ? p(t, a.q) : 1 - p(t, a.q)), prior[k]));
+      const sum = post.reduce((a, b) => a + b, 0);
+      const mean = GRID.reduce((acc, t, k) => acc + t * post[k], 0) / sum;
+      const sd = Math.sqrt(GRID.reduce((acc, t, k) => acc + (t - mean) ** 2 * post[k], 0) / sum);
+      return { theta: mean, sd };
+    }
+    const info = (theta, q) => { const c = 1 / q.options.length; const pr = p(theta, q); return (D * D * ((pr - c) ** 2) * (1 - pr)) / (((1 - c) ** 2) * pr); };
+    function next() {
+      const used = new Set(answers.map(a => a.q.id));
+      const done = type => answers.filter(a => typeOf(a.q) === type).length;
+      const types = Object.keys(quota).filter(t => done(t) < quota[t]);
+      if (!types.length) return null;
+      // Começa por gramática; depois o tipo mais atrasado na sua cota.
+      const type = answers.length < 4 && types.includes('grammar') ? 'grammar'
+        : types.sort((a, b) => (done(a) / quota[a]) - (done(b) / quota[b]))[0];
+      const { theta } = estimate();
+      const pool = bank.filter(q => !used.has(q.id) && typeOf(q) === type);
+      if (!pool.length) { quota[type] = done(type); return next(); }
+      const ranked = pool.map(q => [q, info(theta, q)]).sort((a, b) => b[1] - a[1]).slice(0, 3);
+      return ranked[Math.floor(Math.random() * ranked.length)][0];
+    }
+    const answer = (q, chosen) => { answers.push({ q, chosen, correct: chosen === 0 }); };
+    const levelFor = theta => [...levels].reverse().find(l => theta >= l.min) || levels[0];
+    const score = theta => Math.max(0, Math.min(100, Math.round((theta + 3.5) / 7 * 100)));
+    return { next, answer, estimate, levelFor, score, answers, total, p };
+  }
+
+  function start(cfg) {
+    const levels = cfg.levels;
+    let session = createSession(cfg);
+    let current = null;
+    let plays = 0;
+    let t0 = 0;
+    const total = session.total;
+
+    // ------------------------------------------------------------ telas
+    function show(id) { for (const s of ['intro', 'test', 'result']) $(s).hidden = s !== id; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function say(text) {
+      if (!('speechSynthesis' in window)) { $('pAudioStatus').textContent = 'Seu navegador não tem narração. Pule para a próxima.'; return; }
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = cfg.tts;
+      const v = speechSynthesis.getVoices().find(x => cfg.voice.test(x.lang));
+      if (v) u.voice = v;
+      u.rate = 0.95;
+      speechSynthesis.speak(u);
+    }
+    function render() {
+      current = session.next();
+      if (!current) { finish(); return; }
+      plays = 0;
+      const n = session.answers.length + 1;
+      $('pProgress').style.width = `${(session.answers.length / total) * 100}%`;
+      $('pCount').textContent = `Questão ${n} de ${total}`;
+      $('pType').textContent = cfg.typeLabels[current.type];
+      $('pPassage').hidden = !current.passage;
+      $('pPassage').innerHTML = current.passage ? esc(current.passage).replace(/\n/g, '<br>') : '';
+      $('pAudio').hidden = !current.audio;
+      $('pAudioStatus').textContent = current.audio ? 'Você pode ouvir até 2 vezes.' : '';
+      $('pPlay').disabled = false;
+      $('pStem').innerHTML = esc(current.stem).replace('___', '<span class="blank"></span>');
+      current.order = shuffle(current.options.map((_, i) => i));
+      $('pOptions').innerHTML = current.order.map(i => `<button type="button" data-i="${i}" lang="${cfg.lang}">${esc(current.options[i])}</button>`).join('');
+      $('pOptions').classList.remove('locked');
+      $('test').classList.remove('anim');
+      void $('test').offsetWidth;
+      $('test').classList.add('anim');
+    }
+    $('pPlay').onclick = () => {
+      if (!current?.audio || plays >= 2) return;
+      plays++;
+      say(current.audio);
+      $('pAudioStatus').textContent = plays >= 2 ? 'Última vez ouvida.' : 'Você pode ouvir mais 1 vez.';
+      if (plays >= 2) $('pPlay').disabled = true;
+    };
+    $('pOptions').onclick = e => {
+      const b = e.target.closest('button');
+      if (!b || $('pOptions').classList.contains('locked')) return;
+      $('pOptions').classList.add('locked');
+      b.classList.add('picked');
+      session.answer(current, Number(b.dataset.i));
+      setTimeout(render, 260);
+    };
+    $('pSkip').onclick = () => {
+      if (!current) return;
+      session.answer(current, -1);
+      render();
+    };
+    function finish() {
+      if ('speechSynthesis' in window) speechSynthesis.cancel();
+      const { theta, sd } = session.estimate();
+      const { levelFor, score, answers } = session;
+      const level = levelFor(theta);
+      const result = {
+        lang: cfg.lang, level: level.code, score: score(theta), theta: Math.round(theta * 100) / 100, sd: Math.round(sd * 100) / 100,
+        date: new Date().toISOString(), minutes: Math.round((Date.now() - t0) / 60000),
+        bySkill: Object.fromEntries(Object.keys(cfg.typeLabels).map(t => {
+          const list = answers.filter(a => a.q.type === t);
+          return [t, { right: list.filter(a => a.correct).length, total: list.length }];
+        })),
+      };
+      try {
+        const key = `routine-placement-${cfg.lang}`;
+        const history = JSON.parse(localStorage.getItem(key) || '[]');
+        history.push(result);
+        localStorage.setItem(key, JSON.stringify(history.slice(-20)));
+      } catch (_) { /* navegador sem armazenamento: o resultado só aparece na tela */ }
+      $('pProgress').style.width = '100%';
+      $('rLevel').textContent = level.code;
+      $('rTitle').textContent = level.title;
+      $('rDesc').textContent = level.description;
+      $('rScore').textContent = `${result.score}/100`;
+      $('rRange').textContent = `Faixa provável: ${levelFor(theta - sd).code}–${levelFor(theta + sd).code}`;
+      $('rPlan').innerHTML = level.plan.map(x => `<li>${esc(x)}</li>`).join('');
+      $('rSkills').innerHTML = Object.entries(result.bySkill).filter(([, s]) => s.total).map(([t, s]) =>
+        `<div class="bar"><span>${esc(cfg.typeLabels[t])}</span><div><i style="--w:${Math.round(s.right / s.total * 100)}%"></i></div><b>${s.right}/${s.total}</b></div>`).join('');
+      $('rLevels').innerHTML = levels.map(l => `<span class="${l.code === level.code ? 'on' : ''}">${l.code}</span>`).join('');
+      $('rReview').innerHTML = answers.map((a, i) => `<details><summary>${a.correct ? '✓' : '✗'} ${i + 1}. ${esc(a.q.stem)} <small>${a.q.level}</small></summary>`
+        + `${a.q.passage ? `<p class="small">${esc(a.q.passage).replace(/\n/g, '<br>')}</p>` : ''}${a.q.audio ? `<p class="small"><b>Áudio:</b> ${esc(a.q.audio)}</p>` : ''}`
+        + `<p><b>Resposta:</b> ${esc(a.q.options[0])}${a.correct ? '' : a.chosen < 0 ? ' · você pulou' : ` · você marcou: ${esc(a.q.options[a.chosen])}`}</p><p class="small">${esc(a.q.why)}</p></details>`).join('');
+      show('result');
+      cfg.onResult?.(result);
+    }
+    $('pStart').onclick = () => { session = createSession(cfg); t0 = Date.now(); show('test'); render(); };
+    $('rAgain').onclick = () => show('intro');
+    if ('speechSynthesis' in window) speechSynthesis.getVoices();
+
+    // Último resultado salvo, se houver.
+    try {
+      const last = JSON.parse(localStorage.getItem(`routine-placement-${cfg.lang}`) || '[]').pop();
+      if (last) $('pLast').textContent = `Seu último resultado: ${last.level} (${last.score}/100) em ${new Date(last.date).toLocaleDateString('pt-BR')}.`;
+    } catch (_) { /* sem histórico */ }
+    return session;
+  }
+
+  window.RoutinePlacement = { start, createSession };
+})();
+</script>
+<script>
+const PLACEMENT = {"lang": "en", "tts": "en-US", "voice": "^en", "levels": [{"code": "A1", "b": -2.5, "min": -99, "title": "Iniciante", "description": "Você entende e usa expressões do dia a dia e frases muito simples, como se apresentar e fazer perguntas básicas.", "plan": ["Gramática: simple present, verbo to be, there is/are e preposições de tempo.", "Reading nível A1, um texto por dia.", "Meta diária sugerida: 20 questões."]}, {"code": "A2", "b": -1.5, "min": -2.0, "title": "Básico", "description": "Você se comunica em situações simples e rotineiras: compras, trabalho, família e o passado com frases curtas.", "plan": ["Gramática: simple past, comparativos, going to e present perfect com since/for.", "Reading A2 e “Ouça e escolha” no Listening.", "Meta diária sugerida: 30 questões."]}, {"code": "B1", "b": -0.5, "min": -1.0, "title": "Intermediário", "description": "Você entende os pontos principais de textos claros, lida com viagens e conta experiências e planos.", "plan": ["Gramática: condicionais 1 e 2, past perfect, voz passiva e discurso indireto.", "Reading B1 com cronômetro e Writing B1.", "Meta diária sugerida: 40 questões."]}, {"code": "B2", "b": 0.5, "min": 0.0, "title": "Intermediário superior", "description": "Você discute temas variados com fluência, entende argumentos complexos e escreve textos claros e detalhados.", "plan": ["Gramática: terceira condicional, future perfect, wish e verbos com -ing/to.", "Reading B2, Writing B2 e Speaking em formato entrevista.", "Meta diária sugerida: 50 questões, com 2–3 lacunas."]}, {"code": "C1", "b": 1.5, "min": 1.0, "title": "Avançado", "description": "Você usa o idioma com flexibilidade no trabalho e nos estudos e entende textos longos com sentidos implícitos.", "plan": ["Gramática: inversões, subjuntivo, passiva reportada e linking words avançadas.", "Reading C1 e Writing C1 com correção no chat.", "Meta diária sugerida: 50 questões combinadas."]}, {"code": "C2", "b": 2.5, "min": 2.0, "title": "Proficiente", "description": "Você entende praticamente tudo e se expressa com precisão, nuance e naturalidade.", "plan": ["Desafios C2 e C2+ do Reading e Writing.", "Shadowing de textos C2 no Speaking.", "Mantenha a constância: 30–50 questões por dia para revisar e não perder fluência."]}], "quota": {"grammar": 18, "reading": 6, "listening": 6}, "typeLabels": {"grammar": "Gramática", "vocab": "Vocabulário", "reading": "Leitura", "listening": "Escuta"}, "bank": [{"level": "A1", "type": "grammar", "stem": "I ___ from Brazil.", "options": ["am", "is", "are", "be"], "why": "Com I usamos am.", "passage": null, "audio": null}, {"level": "A1", "type": "grammar", "stem": "She ___ two brothers.", "options": ["has", "have", "is", "haves"], "why": "Terceira pessoa (she) → has.", "passage": null, "audio": null}, {"level": "A1", "type": "grammar", "stem": "There ___ a book on the table.", "options": ["is", "are", "am", "be"], "why": "Singular (a book) → there is.", "passage": null, "audio": null}, {"level": "A1", "type": "grammar", "stem": "___ you like coffee?", "options": ["Do", "Does", "Are", "Is"], "why": "Pergunta no simple present com you → Do.", "passage": null, "audio": null}, {"level": "A1", "type": "vocab", "stem": "The opposite of “big” is ___.", "options": ["small", "tall", "long", "fast"], "why": "big × small.", "passage": null, "audio": null}, {"level": "A1", "type": "grammar", "stem": "We go to school ___ Monday.", "options": ["on", "in", "at", "to"], "why": "Dias da semana → on.", "passage": null, "audio": null}, {"level": "A1", "type": "grammar", "stem": "He ___ TV every evening.", "options": ["watches", "watch", "watching", "is watch"], "why": "Hábito, terceira pessoa → watches.", "passage": null, "audio": null}, {"level": "A1", "type": "vocab", "stem": "My mother's brother is my ___.", "options": ["uncle", "cousin", "nephew", "grandfather"], "why": "Irmão da mãe = tio (uncle).", "passage": null, "audio": null}, {"level": "A2", "type": "grammar", "stem": "I ___ to the cinema last night.", "options": ["went", "go", "gone", "have gone"], "why": "Last night (tempo terminado) → simple past.", "passage": null, "audio": null}, {"level": "A2", "type": "grammar", "stem": "She is ___ than her sister.", "options": ["taller", "more tall", "tallest", "the taller"], "why": "Adjetivo curto no comparativo → -er than.", "passage": null, "audio": null}, {"level": "A2", "type": "grammar", "stem": "Look! It ___.", "options": ["is raining", "rains", "rain", "rained"], "why": "Look! = agora → present continuous.", "passage": null, "audio": null}, {"level": "A2", "type": "grammar", "stem": "We ___ visit our grandparents next weekend.", "options": ["are going to", "going to", "will to", "go to"], "why": "Plano decidido → be going to.", "passage": null, "audio": null}, {"level": "A2", "type": "grammar", "stem": "How ___ money do you have?", "options": ["much", "many", "lot", "few"], "why": "Money é incontável → how much.", "passage": null, "audio": null}, {"level": "A2", "type": "grammar", "stem": "I've lived here ___ 2015.", "options": ["since", "for", "from", "during"], "why": "Ponto de início → since.", "passage": null, "audio": null}, {"level": "A2", "type": "vocab", "stem": "I need to ___ an appointment with the dentist.", "options": ["make", "do", "take", "say"], "why": "Colocação: make an appointment.", "passage": null, "audio": null}, {"level": "A2", "type": "grammar", "stem": "You ___ smoke here. It's forbidden.", "options": ["mustn't", "don't have to", "needn't", "aren't"], "why": "Proibição → mustn't.", "passage": null, "audio": null}, {"level": "B1", "type": "grammar", "stem": "If it rains tomorrow, we ___ at home.", "options": ["will stay", "stay", "would stay", "stayed"], "why": "Primeira condicional: if + presente, will + verbo.", "passage": null, "audio": null}, {"level": "B1", "type": "grammar", "stem": "When I arrived, the film ___.", "options": ["had already started", "already started", "has already started", "was already start"], "why": "Ação anterior a outra no passado → past perfect.", "passage": null, "audio": null}, {"level": "B1", "type": "grammar", "stem": "The book ___ by millions of people.", "options": ["has been read", "has read", "is reading", "have been read"], "why": "Voz passiva no present perfect (singular).", "passage": null, "audio": null}, {"level": "B1", "type": "grammar", "stem": "She asked me where I ___.", "options": ["lived", "live", "do live", "am living"], "why": "Discurso indireto: o tempo recua (live → lived).", "passage": null, "audio": null}, {"level": "B1", "type": "grammar", "stem": "I'm not used to ___ up so early.", "options": ["getting", "get", "got", "be getting"], "why": "Be used to + -ing.", "passage": null, "audio": null}, {"level": "B1", "type": "vocab", "stem": "Could you ___ the music down? I'm trying to sleep.", "options": ["turn", "put", "take", "give"], "why": "Turn down = abaixar o volume.", "passage": null, "audio": null}, {"level": "B1", "type": "grammar", "stem": "He suggested ___ a taxi.", "options": ["taking", "to take", "take", "that taking"], "why": "Suggest + -ing.", "passage": null, "audio": null}, {"level": "B1", "type": "grammar", "stem": "This is the man ___ car was stolen.", "options": ["whose", "who", "which", "that's"], "why": "Posse em oração relativa → whose.", "passage": null, "audio": null}, {"level": "B2", "type": "grammar", "stem": "If I had known, I ___ you.", "options": ["would have told", "would tell", "had told", "will have told"], "why": "Terceira condicional: would have + particípio.", "passage": null, "audio": null}, {"level": "B2", "type": "grammar", "stem": "By the time you arrive, we ___ dinner.", "options": ["will have finished", "will finish", "finished", "have finished"], "why": "Ação concluída antes de um ponto no futuro → future perfect.", "passage": null, "audio": null}, {"level": "B2", "type": "grammar", "stem": "She denied ___ the money.", "options": ["taking", "to take", "take", "to have take"], "why": "Deny + -ing.", "passage": null, "audio": null}, {"level": "B2", "type": "grammar", "stem": "You ___ have called me; I was worried!", "options": ["should", "must", "can", "would"], "why": "Crítica sobre o passado → should have + particípio.", "passage": null, "audio": null}, {"level": "B2", "type": "vocab", "stem": "The match was ___ off because of the storm.", "options": ["called", "turned", "taken", "given"], "why": "Call off = cancelar.", "passage": null, "audio": null}, {"level": "B2", "type": "grammar", "stem": "I wish I ___ more time to travel.", "options": ["had", "have", "would have", "will have"], "why": "Desejo sobre o presente → wish + past simple.", "passage": null, "audio": null}, {"level": "B2", "type": "grammar", "stem": "It's high time we ___ home.", "options": ["went", "go", "will go", "are going"], "why": "It's high time + past simple.", "passage": null, "audio": null}, {"level": "B2", "type": "vocab", "stem": "The new policy had a significant ___ on sales.", "options": ["impact", "affect", "influent", "consequent"], "why": "Substantivo correto: impact on.", "passage": null, "audio": null}, {"level": "C1", "type": "grammar", "stem": "Hardly ___ the house when it started to rain.", "options": ["had I left", "I had left", "did I leave", "I left"], "why": "Hardly no início pede inversão: had I left.", "passage": null, "audio": null}, {"level": "C1", "type": "grammar", "stem": "Not only ___ late, but he also forgot the tickets.", "options": ["was he", "he was", "he is", "had he"], "why": "Not only no início pede inversão: was he.", "passage": null, "audio": null}, {"level": "C1", "type": "grammar", "stem": "Had I known about the delay, I ___ earlier.", "options": ["would have left", "would leave", "had left", "will leave"], "why": "Condicional invertida (Had I known) + would have.", "passage": null, "audio": null}, {"level": "C1", "type": "grammar", "stem": "The project, ___ was funded by the EU, ended last year.", "options": ["which", "that", "what", "who"], "why": "Oração explicativa (entre vírgulas) não aceita that → which.", "passage": null, "audio": null}, {"level": "C1", "type": "vocab", "stem": "Her argument doesn't ___ water.", "options": ["hold", "keep", "carry", "take"], "why": "Expressão: not hold water = não se sustentar.", "passage": null, "audio": null}, {"level": "C1", "type": "grammar", "stem": "It is essential that he ___ on time.", "options": ["be", "is", "will be", "being"], "why": "Subjuntivo: essential that + verbo base.", "passage": null, "audio": null}, {"level": "C1", "type": "grammar", "stem": "She is said ___ the company in 2010.", "options": ["to have founded", "to found", "having founded", "that she founded"], "why": "Passiva reportada sobre o passado → to have + particípio.", "passage": null, "audio": null}, {"level": "C1", "type": "vocab", "stem": "We need to ___ a balance between cost and quality.", "options": ["strike", "hit", "make", "take"], "why": "Colocação: strike a balance.", "passage": null, "audio": null}, {"level": "C2", "type": "grammar", "stem": "Little ___ that the decision would change everything.", "options": ["did they know", "they knew", "they did know", "knew they"], "why": "Little no início pede inversão com auxiliar: did they know.", "passage": null, "audio": null}, {"level": "C2", "type": "grammar", "stem": "___ it not been for your help, we would have failed.", "options": ["Had", "Were", "Was", "Should"], "why": "Had it not been for = se não fosse (passado).", "passage": null, "audio": null}, {"level": "C2", "type": "vocab", "stem": "His explanation was so ___ that nobody could follow it.", "options": ["convoluted", "convoluting", "convolution", "convolutely"], "why": "Adjetivo: convoluted = enrolado, complicado.", "passage": null, "audio": null}, {"level": "C2", "type": "vocab", "stem": "She has a ___ for languages; she speaks seven.", "options": ["flair", "flare", "flavour", "flirt"], "why": "Flair = talento natural (não confundir com flare).", "passage": null, "audio": null}, {"level": "C2", "type": "grammar", "stem": "No sooner had we sat down ___ the lights went out.", "options": ["than", "when", "that", "then"], "why": "No sooner … than.", "passage": null, "audio": null}, {"level": "C2", "type": "vocab", "stem": "The new evidence ___ the theory.", "options": ["corroborates", "collaborates", "corrodes", "corresponds"], "why": "Corroborate = confirmar.", "passage": null, "audio": null}, {"level": "C2", "type": "grammar", "stem": "I'd rather you ___ mention it to anyone.", "options": ["didn't", "don't", "won't", "not"], "why": "I'd rather + outra pessoa + past simple.", "passage": null, "audio": null}, {"level": "C2", "type": "vocab", "stem": "The plan was ___ from the start; it never had a chance.", "options": ["doomed", "deemed", "damned", "dimmed"], "why": "Doomed from the start = fadado ao fracasso.", "passage": null, "audio": null}, {"level": "A1", "type": "reading", "stem": "Where does Tom work?", "options": ["In a café", "In an office", "In a school", "In a hospital"], "why": "“I work in a café.”", "passage": "Hi, I'm Tom. I'm 25 and I live in London with my cat, Max. I work in a café. I start work at 7 a.m., so I get up very early.", "audio": null}, {"level": "A1", "type": "reading", "stem": "Why does Tom get up early?", "options": ["He starts work at 7", "He has a cat", "He lives in London", "He likes mornings"], "why": "“I start work at 7 a.m., so I get up very early.”", "passage": "Hi, I'm Tom. I'm 25 and I live in London with my cat, Max. I work in a café. I start work at 7 a.m., so I get up very early.", "audio": null}, {"level": "A1", "type": "reading", "stem": "When can you visit the library on Saturday?", "options": ["From 10:00 to 14:00", "From 9:00 to 18:00", "All day", "You can't, it's closed"], "why": "Saturday 10:00–14:00.", "passage": "LIBRARY HOURS\nMonday to Friday: 9:00–18:00\nSaturday: 10:00–14:00\nSunday: closed", "audio": null}, {"level": "A2", "type": "reading", "stem": "What is Ana's problem?", "options": ["She finishes work late", "She doesn't like parties", "She can't make a cake", "She is ill"], "why": "“I have to work until 8 p.m.”", "passage": "Hi Sara,\nThanks for the invitation! I'd love to come to your party on Saturday, but I have to work until 8 p.m. Can I come a bit later, around 9? I'll bring a cake.\nAna", "audio": null}, {"level": "A2", "type": "reading", "stem": "Two adults and one 8-year-old visit on a normal Tuesday. How much do they pay?", "options": ["£30", "£36", "£24", "Nothing"], "why": "£12 + £12 + £6 = £30.", "passage": "The museum is free on the first Sunday of every month. On other days, tickets cost £12 for adults and £6 for children under 12. Groups of more than 10 people must book in advance.", "audio": null}, {"level": "B1", "type": "reading", "stem": "What did the study find?", "options": ["People working from home were more productive", "People working from home took more breaks", "Office workers completed more tasks", "Productivity did not change"], "why": "“those who worked from home completed 13% more tasks”.", "passage": "Many people believe that working from home makes employees less productive. However, a recent study of 16,000 workers found the opposite: those who worked from home completed 13% more tasks, mainly because they took fewer breaks and sick days.", "audio": null}, {"level": "B1", "type": "reading", "stem": "Why were they more productive?", "options": ["They took fewer breaks and sick days", "They worked longer hours", "They were paid more", "They had more meetings"], "why": "“mainly because they took fewer breaks and sick days”.", "passage": "Many people believe that working from home makes employees less productive. However, a recent study of 16,000 workers found the opposite: those who worked from home completed 13% more tasks, mainly because they took fewer breaks and sick days.", "audio": null}, {"level": "B1", "type": "reading", "stem": "What will the company do?", "options": ["Send the order in two parts", "Cancel the whole order", "Charge extra for delivery", "Wait and send everything together"], "why": "“We will send the available items now and the remaining item as soon as it arrives”.", "passage": "Dear customer, your order #4521 has been delayed because one of the items is temporarily out of stock. We will send the available items now and the remaining item as soon as it arrives, at no extra cost. If you prefer, you can cancel the missing item for a full refund.", "audio": null}, {"level": "B2", "type": "reading", "stem": "What is the main point of the text?", "options": ["The benefit of electric cars depends on how electricity is produced", "Electric cars pollute more than petrol cars", "Coal is cleaner than people think", "Electric cars produce exhaust emissions"], "why": "“their environmental benefits depend largely on how the electricity is generated”.", "passage": "Although electric cars produce no exhaust emissions, critics argue that their environmental benefits depend largely on how the electricity is generated. In countries where most power still comes from coal, the overall reduction in carbon emissions may be smaller than expected.", "audio": null}, {"level": "B2", "type": "reading", "stem": "Why was the decision postponed?", "options": ["To consult the residents first", "Because local businesses rejected it", "Because there was no money", "Because the centre was already built"], "why": "“until residents have been consulted”.", "passage": "The town council has postponed the decision on the new shopping centre until residents have been consulted. While some local businesses welcome the project, others fear it will draw customers away from the high street.", "audio": null}, {"level": "B2", "type": "reading", "stem": "What do some businesses fear?", "options": ["Losing customers to the new centre", "Higher taxes", "The council closing them", "Too many new residents"], "why": "“others fear it will draw customers away from the high street”.", "passage": "The town council has postponed the decision on the new shopping centre until residents have been consulted. While some local businesses welcome the project, others fear it will draw customers away from the high street.", "audio": null}, {"level": "C1", "type": "reading", "stem": "According to the text, multitasking…", "options": ["mostly means switching between tasks, which has a cost", "is an efficient way to work", "is impossible for the brain", "has no effect on attention"], "why": "“rapid switching between tasks — a process that incurs a cognitive cost”.", "passage": "The notion that multitasking boosts efficiency has been steadily undermined by research. What appears to be simultaneous processing is, in most cases, rapid switching between tasks — a process that incurs a cognitive cost each time attention shifts.", "audio": null}, {"level": "C1", "type": "reading", "stem": "What did the critics claim?", "options": ["The tax cuts mainly helped the richest households", "Inequality fell", "Median incomes rose sharply", "The wealthiest paid more tax"], "why": "“had disproportionately benefited the wealthiest households”.", "passage": "Critics of the policy were quick to point out that, far from reducing inequality, the tax cuts had disproportionately benefited the wealthiest households, whose savings rose markedly while median incomes stagnated.", "audio": null}, {"level": "C2", "type": "reading", "stem": "The reviewer suggests that the memoir…", "options": ["may use honesty as a way of settling old scores", "is completely objective", "avoids personal feelings", "was written by someone else"], "why": "“whether its candour is a virtue or merely a more sophisticated form of score-settling”.", "passage": "Far from being a dispassionate chronicle, the memoir is shot through with the author's lingering resentments; one is left wondering whether its candour is a virtue or merely a more sophisticated form of score-settling.", "audio": null}, {"level": "C2", "type": "reading", "stem": "The writer's attitude to the null results is…", "options": ["positive, because reporting them counters publication bias", "that they prove the experiment failed", "that they should not have been published", "indifferent"], "why": "“the willingness to report what did not work is itself a contribution”.", "passage": "That the experiment yielded null results is less damning than it might first appear: in a field plagued by publication bias, the willingness to report what did not work is itself a contribution.", "audio": null}, {"level": "A1", "type": "listening", "stem": "What is Lucy's job?", "options": ["Teacher", "Doctor", "Student", "Cook"], "why": "“I'm a teacher.”", "passage": null, "audio": "Hello, my name is Lucy. I'm a teacher and I have two children."}, {"level": "A1", "type": "listening", "stem": "When does the bus leave?", "options": ["At 9:30", "At 9:00", "At 10:30", "At 8:30"], "why": "“half past nine” = 9:30.", "passage": null, "audio": "The bus to the airport leaves at half past nine."}, {"level": "A2", "type": "listening", "stem": "Why is the speaker driving today?", "options": ["There is a train strike", "The car is new", "It's raining", "The train is late"], "why": "“because there's a strike”.", "passage": null, "audio": "I usually take the train to work, but today I'm driving because there's a strike."}, {"level": "A2", "type": "listening", "stem": "What does the customer NOT order?", "options": ["A cup of tea", "A cappuccino", "A cheese sandwich", "Water"], "why": "Pede cappuccino, sanduíche e água; não pede chá.", "passage": null, "audio": "Can I have a large cappuccino and a cheese sandwich, please? Oh, and a bottle of water."}, {"level": "B1", "type": "listening", "stem": "What did the speaker decide to do?", "options": ["Become a vet", "Study medicine", "Open an animal shelter", "Stop studying"], "why": "“I wanted to become a vet instead”.", "passage": null, "audio": "I was going to study medicine, but after volunteering at an animal shelter, I realised I wanted to become a vet instead."}, {"level": "B1", "type": "listening", "stem": "What has changed?", "options": ["The platform", "The departure time", "The destination", "The train was cancelled"], "why": "“platform 4 instead of platform 2”.", "passage": null, "audio": "Attention, passengers. The six fifteen train to Manchester will depart from platform four instead of platform two. We apologise for any inconvenience."}, {"level": "B2", "type": "listening", "stem": "What happened?", "options": ["The forecast was wrong and they got caught in a storm", "They didn't go because of the forecast", "They reached the top before the storm", "The storm was correctly predicted"], "why": "“Had the forecast been accurate, we'd never have set off”.", "passage": null, "audio": "Had the forecast been accurate, we'd never have set off that morning. As it was, we got caught in the storm halfway up the mountain."}, {"level": "B2", "type": "listening", "stem": "How does the speaker feel about the job offer?", "options": ["The salary is too low", "The job is too easy", "They accept it happily", "They want less responsibility"], "why": "“the salary falls short of what I'd expect”.", "passage": null, "audio": "While I appreciate the offer, I'm afraid the salary falls short of what I'd expect for a role with this level of responsibility."}, {"level": "C1", "type": "listening", "stem": "What is the speaker's view of the proposal?", "options": ["The idea is good, but the timing is bad", "The proposal has no value", "The budget cuts are over", "The timing is ideal"], "why": "“It's not that the proposal lacks merit; it's that the timing couldn't be worse”.", "passage": null, "audio": "It's not that the proposal lacks merit; it's that the timing couldn't be worse, given the budget cuts we're facing this quarter."}, {"level": "C1", "type": "listening", "stem": "Why has the population declined?", "options": ["Housing became too expensive for young people", "There are fewer jobs", "Older residents moved away", "It hasn't, it has grown"], "why": "“younger residents have been priced out of the housing market”.", "passage": null, "audio": "Contrary to popular belief, the city's population has actually declined slightly over the past decade, largely because younger residents have been priced out of the housing market."}, {"level": "C2", "type": "listening", "stem": "The speaker thinks the campaign…", "options": ["was disappointing but not a total failure", "was a complete success", "exceeded expectations", "was a total failure"], "why": "“I wouldn't go so far as to call it a failure, but … fell well short”.", "passage": null, "audio": "I wouldn't go so far as to call it a failure, but the campaign certainly fell well short of the lofty expectations its organisers had set for it."}, {"level": "C2", "type": "listening", "stem": "What is the speaker's criticism of the novel?", "options": ["It has too many ideas and abandons its plot", "It lacks ambition", "The plot is too simple", "It is too short"], "why": "“buckles under the weight of its own ideas; the plot is all but abandoned”.", "passage": null, "audio": "Her latest novel, while undeniably ambitious, buckles under the weight of its own ideas. The plot is all but abandoned halfway through."}]};
+RoutinePlacement.start({ ...PLACEMENT, voice: new RegExp(PLACEMENT.voice, 'i') });
+</script>
+</body>
+</html>

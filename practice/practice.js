@@ -1,9 +1,16 @@
+/* Routine Practice — treino de questões comum a todos os idiomas.
+ * Cada idioma define window.ROUTINE_APP (lang.js) e os dados (ROUTINE_DATA) no build.
+ * Ver docs/PADRAO-IDIOMAS.md.
+ */
 (() => {
   'use strict';
-  const KEY = 'routine-ko-v1';
+  const APP = window.ROUTINE_APP;
+  const L = APP.lang;
+  const D = window.ROUTINE_DATA;
+  const KEY = `routine-${L.code}-v1`;
   const ROUND_SIZE = 20;
   const $ = id => document.getElementById(id);
-  const byId = new Map(KDATA.questions.map(q => [q.id, q]));
+  const byId = new Map(D.questions.map(q => [q.id, q]));
 
   // ------------------------------------------------------------ state
   function emptyState() {
@@ -31,13 +38,13 @@
   };
 
   // ------------------------------------------------------------ voz
-  let koVoice = null;
+  let voice = null;
   function pickVoice() {
     if (!('speechSynthesis' in window)) return;
-    koVoice = speechSynthesis.getVoices().find(v => /^ko/i.test(v.lang)) || null;
+    voice = speechSynthesis.getVoices().find(v => L.voice.test(v.lang)) || null;
     const notice = $('voiceNotice');
-    if (!koVoice && speechSynthesis.getVoices().length) {
-      notice.textContent = 'Seu aparelho não tem voz em coreano instalada. O áudio pode soar estranho: instale a voz “Coreano” nas configurações de idioma/fala do sistema.';
+    if (!voice && speechSynthesis.getVoices().length) {
+      notice.textContent = `Seu aparelho não tem voz em ${L.name} instalada. O áudio pode soar estranho: instale a voz “${L.nameCap}” nas configurações de idioma/fala do sistema.`;
       notice.hidden = false;
     } else {
       notice.hidden = true;
@@ -47,9 +54,9 @@
     if (!('speechSynthesis' in window) || !text) return;
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ko-KR';
-    if (koVoice) u.voice = koVoice;
-    u.rate = 0.85;
+    u.lang = L.tts;
+    if (voice) u.voice = voice;
+    u.rate = L.rate || 0.85;
     speechSynthesis.speak(u);
   }
   if ('speechSynthesis' in window) {
@@ -59,7 +66,8 @@
 
   // ------------------------------------------------------------ util
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const hasHangul = s => /[ᄀ-ᇿ㄰-㆏가-힣]/.test(s);
+  // Texto no idioma estudado (para lang= e para decidir o que dá para digitar).
+  const hasScript = s => L.script.test(s);
   function shuffle(list) {
     const a = [...list];
     for (let i = a.length - 1; i > 0; i--) {
@@ -81,8 +89,8 @@
 
   // ------------------------------------------------------------ treino
   const filters = $('moduleFilters');
-  filters.innerHTML = Object.entries(KDATA.modules).map(([key, label]) => {
-    const n = KDATA.questions.filter(q => q.module === key).length;
+  filters.innerHTML = Object.entries(D.modules).map(([key, label]) => {
+    const n = D.questions.filter(q => q.module === key).length;
     return `<label><input type="checkbox" value="${key}" checked> ${esc(label)} <span class="muted small">(${n})</span></label>`;
   }).join('');
 
@@ -95,19 +103,19 @@
 
   const mode = () => (document.querySelector('input[name=mode]:checked')?.value === 'typing' ? 'typing' : 'choice');
   const slotsOf = q => q.slots || [{ answers: q.answers, distractors: q.distractors, label: '' }];
-  // Digitação só onde a resposta é hangul (significados em português ficam na múltipla escolha).
-  const typeable = q => slotsOf(q).every(s => s.answers.every(hasHangul));
+  // Digitação só onde a resposta está no idioma (significados em português ficam na múltipla escolha).
+  const typeable = q => slotsOf(q).every(s => hasScript(s.answers[0]));
   const norm = s => String(s).normalize('NFC').replace(/[\s.?!,·~]/g, '').toLowerCase();
-  const romanOf = text => (state.showRoman !== false && KDATA.roman[text]) || '';
+  const romanOf = text => (state.showRoman !== false && D.roman[text]) || '';
   const optionLabel = o => {
     const roman = romanOf(o);
-    return `<span${hasHangul(o) ? ' lang="ko"' : ''}>${esc(o)}</span>${roman ? `<small>${esc(roman)}</small>` : ''}`;
+    return `<span${hasScript(o) ? ' lang="${L.html}"' : ''}>${esc(o)}</span>${roman ? `<small>${esc(roman)}</small>` : ''}`;
   };
 
   function pool() {
     const modules = new Set([...filters.querySelectorAll('input:checked')].map(i => i.value));
     const levels = new Set([$('level1').checked && 1, $('level2').checked && 2].filter(Boolean));
-    return KDATA.questions.filter(q => modules.has(q.module) && levels.has(q.level) && (mode() === 'choice' || typeable(q)));
+    return D.questions.filter(q => modules.has(q.module) && levels.has(q.level) && (mode() === 'choice' || typeable(q)));
   }
 
   function wrongIds() {
@@ -123,14 +131,14 @@
     if (review) {
       list = wrongIds().map(id => byId.get(id)).filter(q => mode() === 'choice' || typeable(q));
       if (!list.length) {
-        showEmpty('Nenhum erro para revisar neste formato. 잘했어요! (Muito bem!)');
+        showEmpty(`Nenhum erro para revisar neste formato. ${L.praise || ''} (Muito bem!)`);
         return;
       }
     } else {
       list = pool();
       if (!list.length) {
         showEmpty(mode() === 'typing'
-          ? 'Nenhuma questão para digitar nesta seleção. Inclua partículas, verbos, completar frases ou vocabulário.'
+          ? `Nenhuma questão para digitar nesta seleção. Inclua conteúdos com resposta em ${L.name}.`
           : 'Escolha ao menos um conteúdo e um nível.');
         return;
       }
@@ -164,12 +172,12 @@
     const multi = slots.length > 1;
     answered = false;
     picks = slots.map(() => null);
-    $('qMeta').textContent = `${KDATA.modules[q.module]} · TOPIK ${q.level}${reviewMode ? ' · revisão' : ''}`;
+    $('qMeta').textContent = `${D.modules[q.module]} · ${L.levelPrefix} ${q.level}${reviewMode ? ' · revisão' : ''}`;
     $('qCount').textContent = `${index + 1} de ${round.length}`;
     $('qPrompt').textContent = q.prompt;
     const qText = $('qText');
     qText.innerHTML = esc(q.text).replace(/___/g, '<span class="blank"></span>');
-    qText.lang = hasHangul(q.text) ? 'ko' : 'pt-BR';
+    qText.lang = hasScript(q.text) ? L.html : 'pt-BR';
     // Em frases com lacunas o áudio entregaria a resposta: só toca depois de corrigir.
     $('speak').hidden = !q.audio || q.module === 'completar';
     $('typingHint').hidden = !typing;
@@ -184,7 +192,7 @@
       setTimeout(() => $('typed').focus(), 0);
     } else if (typing) {
       $('slots').innerHTML = slots.map((s, i) =>
-        `<div class="slot"><h3>Lacuna ${i + 1} · ${esc(s.label)}</h3><input data-slot="${i}" lang="ko" autocomplete="off" autocapitalize="off" spellcheck="false"></div>`).join('');
+        `<div class="slot"><h3>Lacuna ${i + 1} · ${esc(s.label)}</h3><input data-slot="${i}" lang="${L.html}" autocomplete="off" autocapitalize="off" spellcheck="false"></div>`).join('');
     } else if (multi) {
       $('slots').innerHTML = slots.map((s, i) => {
         const options = shuffle([s.answers[0], ...s.distractors.slice(0, 3)]);
@@ -250,8 +258,8 @@
     if (q.text.includes('___')) expected.forEach(v => { complete = complete.replace('___', v); });
     else complete = expected.join(' · ');
     const roman = q.roman ? ` <span class="muted">(${esc(q.roman)})</span>` : '';
-    fb.innerHTML = `<strong>${correct ? 'Correto! 맞아요!' : 'Resposta certa:'}</strong>${roman}<br>`
-      + `<span${hasHangul(complete) ? ' lang="ko"' : ''}>${esc(complete)}</span><br>${esc(q.explanation)}`;
+    fb.innerHTML = `<strong>${correct ? `Correto! ${L.cheer || ''}` : 'Resposta certa:'}</strong>${roman}<br>`
+      + `<span${hasScript(complete) ? ' lang="${L.html}"' : ''}>${esc(complete)}</span><br>${esc(q.explanation)}`;
     fb.hidden = false;
     if (q.audio && q.module !== 'escuta') speak(q.audio);
     $('speak').hidden = !q.audio;
@@ -281,7 +289,7 @@
     }
   });
   addEventListener('keydown', event => {
-    // isComposing: o Enter que fecha a sílaba no teclado coreano não corrige.
+    // isComposing: o Enter que confirma a composição no teclado do idioma (IME) não corrige.
     if (event.key !== 'Enter' || event.isComposing) return;
     if (!$('check').hidden && event.target.closest?.('#questionCard')) { event.preventDefault(); $('check').click(); }
     else if (!$('next').hidden && !event.target.closest?.('button')) { event.preventDefault(); $('next').click(); }
@@ -329,38 +337,11 @@
     $('goalStatus').textContent = done >= goal ? `Meta de hoje cumprida: ${done}/${goal} ✓` : `Hoje: ${done}/${goal}`;
   }
 
-  // ------------------------------------------------------------ hangul
-  function letterButton(char, top, bottom) {
-    return `<button type="button" data-say="${esc(char)}"><b lang="ko">${esc(char)}</b><small>${esc(top)}</small>${bottom ? `<small>${esc(bottom)}</small>` : ''}</button>`;
-  }
-  $('consonants').innerHTML = KDATA.consonants.map(([c, rr, name]) => letterButton(c, rr, name)).join('');
-  $('vowels').innerHTML = KDATA.vowels.map(([v, rr]) => letterButton(v, rr)).join('');
-  const INITIALS = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
-  const MEDIALS = 'ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ';
-  const RR = Object.fromEntries(KDATA.consonants.map(([c, rr]) => [c, rr.split('/')[0]]));
-  RR['ㅇ'] = '';
-  RR['ㄹ'] = 'r';
-  const VRR = Object.fromEntries(KDATA.vowels);
-  const syllables = [];
-  for (const c of 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅎ') {
-    for (const v of 'ㅏㅓㅗㅜㅣ') {
-      const syl = String.fromCharCode(0xac00 + (INITIALS.indexOf(c) * 21 + MEDIALS.indexOf(v)) * 28);
-      syllables.push(letterButton(syl, RR[c] + VRR[v]));
-    }
-  }
-  $('syllables').innerHTML = syllables.join('');
-  // Nome da letra soa melhor que a letra solta no TTS.
-  const NAMES = { ㄱ: '기역', ㄴ: '니은', ㄷ: '디귿', ㄹ: '리을', ㅁ: '미음', ㅂ: '비읍', ㅅ: '시옷', ㅇ: '이응', ㅈ: '지읒', ㅊ: '치읓', ㅋ: '키읔', ㅌ: '티읕', ㅍ: '피읖', ㅎ: '히읗', ㄲ: '쌍기역', ㄸ: '쌍디귿', ㅃ: '쌍비읍', ㅆ: '쌍시옷', ㅉ: '쌍지읒' };
-  $('alphabet').addEventListener('click', event => {
-    const button = event.target.closest('[data-say]');
-    if (!button) return;
-    const ch = button.dataset.say;
-    const vowelIndex = MEDIALS.indexOf(ch);
-    speak(NAMES[ch] || (vowelIndex >= 0 ? String.fromCharCode(0xac00 + (11 * 21 + vowelIndex) * 28) : ch));
-  });
+  // ------------------------------------------------------------ alfabeto (específico do idioma)
+  APP.alphabet?.({ $, esc, speak, data: D });
 
   // ------------------------------------------------------------ guia
-  $('guideList').innerHTML = KDATA.guide.map(([title, body], i) =>
+  $('guideList').innerHTML = D.guide.map(([title, body], i) =>
     `<details${i < 2 ? ' open' : ''}><summary>${esc(title)}</summary><p>${esc(body)}</p></details>`).join('');
 
   // ------------------------------------------------------------ progresso
@@ -373,7 +354,7 @@
     $('sToday').textContent = attempts.filter(a => a.day === today()).length;
     const wrong = wrongIds();
     $('sWrong').textContent = wrong.length;
-    $('byModule').innerHTML = Object.entries(KDATA.modules).map(([key, label]) => {
+    $('byModule').innerHTML = Object.entries(D.modules).map(([key, label]) => {
       const list = attempts.filter(a => byId.get(a.qid).module === key);
       const ok = list.filter(a => a.correct).length;
       return `<tr><td>${esc(label)}</td><td>${list.length}</td><td>${list.length ? Math.round((ok / list.length) * 100) + '%' : '—'}</td></tr>`;
@@ -381,12 +362,12 @@
     const recent = attempts.filter(a => !a.correct).slice(-8).reverse();
     $('lastWrong').innerHTML = recent.length ? recent.map(a => {
       const q = byId.get(a.qid);
-      return `<p><span lang="${hasHangul(q.text) ? 'ko' : 'pt-BR'}">${esc(q.text)}</span> → <strong lang="ko">${esc(q.answers[0])}</strong> <span class="muted small">(você marcou ${esc(a.answer)})</span></p>`;
+      return `<p><span lang="${hasScript(q.text) ? L.html : 'pt-BR'}">${esc(q.text)}</span> → <strong lang="${L.html}">${esc(q.answers[0])}</strong> <span class="muted small">(você marcou ${esc(a.answer)})</span></p>`;
     }).join('') : '<p class="muted">Nenhum erro ainda.</p>';
   }
 
   $('reset').addEventListener('click', () => {
-    if (!confirm('Apagar todo o histórico do Korean Routine? O English Routine não é afetado.')) return;
+    if (!confirm(`Apagar todo o histórico do ${L.brand}? Os outros idiomas não são afetados.`)) return;
     state = { ...emptyState(), goal: state.goal };
     save();
     renderProgress();
@@ -396,43 +377,15 @@
   });
 
   // ------------------------------------------------------------ habilidades (módulo comum skills/)
-  const CONNECTORS = ['그리고', '그래서', '하지만', '그런데', '그러면', '왜냐하면', '그러니까', '또', '먼저', '마지막으로'];
-  function writingChecks(text) {
-    const notes = [];
-    const sentences = text.split(/[.!?\n]+/).map(x => x.trim()).filter(x => /[가-힣]/.test(x));
-    const polite = sentences.filter(x => /요$/.test(x)).length;
-    const formal = sentences.filter(x => /니다$/.test(x)).length;
-    const plain = sentences.filter(x => /[^니]다$/.test(x)).length;
-    const styles = [polite && '-요 (educado)', formal && '-ㅂ니다 (formal)', plain && '-다 (escrito/diário)'].filter(Boolean);
-    if (styles.length > 1) notes.push(`Você misturou estilos de terminação: ${styles.join(', ')}. Em um mesmo texto, escolha um.`);
-    else if (styles.length === 1) notes.push(`Terminação consistente: ${styles[0]}.`);
-    const latin = (text.match(/[A-Za-z]/g) || []).length;
-    const hangul = (text.match(/[가-힣]/g) || []).length;
-    if (latin > hangul * 0.2) notes.push('Há bastante alfabeto latino. Tente escrever tudo em hangul (nomes estrangeiros também podem ser escritos em hangul).');
-    const repeated = Object.entries((text.match(/[가-힣]+/g) || []).reduce((m, w) => ({ ...m, [w]: (m[w] || 0) + 1 }), {}))
-      .filter(([w, n]) => n >= 3 && w.length >= 2).map(([w]) => w);
-    if (repeated.length) notes.push(`Palavras repetidas 3+ vezes: <span lang="ko">${repeated.slice(0, 5).join(', ')}</span>. Varie com sinônimos ou junte frases com conectores.`);
-    if (/(은는|이가|을를)/.test(text)) notes.push('Parece haver duas partículas seguidas (ex.: 은는). Confira.');
-    return notes;
-  }
-  const tutorPrompt = (p, text) => `Corrija meu texto em coreano com explicações em português. Nível de treino: ${p.level}. `
-    + `Proposta: ${p.prompt} (${p.prompt_pt}). Meta: ${p.lines} linhas e ${p.units} sílabas. `
-    + 'Analise: cumprimento da proposta, partículas (은/는, 이/가, 을/를, 에/에서), conjugação e tempo verbal, consistência do nível de formalidade (-요, -ㅂ니다, -다), '
-    + 'espaçamento (띄어쓰기), ortografia e vocabulário. Mostre cada erro com a correção e a regra, depois uma versão revisada que preserve minhas ideias, '
-    + 'com romanização de frases difíceis. Termine com três prioridades para o próximo treino.\n\nMeu texto:\n' + text;
-
   skills = RoutineSkills.mount({
-    lang: {
-      code: 'ko', name: 'coreano', html: 'ko', tts: 'ko-KR', voice: /^ko/i, rate: 0.85,
-      unit: 'syllables', unitLabel: 'sílabas', connectors: CONNECTORS, writePlaceholder: '여기에 한국어로 써 보세요…',
-    },
-    data: KDATA.skills,
-    roman: KDATA.roman,
+    lang: { ...APP.skills, code: L.code, name: L.name, html: L.html, tts: L.tts, voice: L.voice },
+    data: D.skills,
+    roman: D.roman,
     skills: () => (state.skills ??= { events: [] }),
     save,
     day: today,
-    writingChecks,
-    tutorPrompt,
+    writingChecks: APP.writingChecks,
+    tutorPrompt: APP.tutorPrompt,
   });
 
   renderGoal();

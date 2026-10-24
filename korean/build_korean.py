@@ -5,7 +5,6 @@ IDs são estáveis (prefixo por módulo + ordem fixa) para preservar o históric
 """
 from __future__ import annotations
 
-import json
 import random
 from pathlib import Path
 
@@ -17,13 +16,17 @@ from romanize import has_syllable, romanize
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT.parent))
+from practice.build import build_app  # noqa: E402
 from skills.build import skills_bundle  # noqa: E402
 PUBLIC = ROOT.parent / "public"
-GUARD = ('<style>html[data-cloud-auth="pending"] body{visibility:hidden}</style>'
-         '<script>document.documentElement.dataset.cloudAuth="pending"</script>'
-         '<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>'
-         '<script src="/config.js"></script><script>window.ROUTINE_LANGUAGE="ko"</script>'
-         '<script src="/assets/cloud-sync.js?v=20261023-1"></script>')
+PAGE = {
+    "code": "ko", "html_lang": "ko", "brand": "Korean Routine", "brand_word": "korean", "name": "coreano",
+    "alphabet_tab": "Hangul", "eyebrow": "Coreano todos os dias · TOPIK 1–2", "headline": "안녕하세요! Vamos treinar.",
+    "intro": "questões de hangul, vocabulário, partículas, verbos, frases para completar, números e escuta — com temas de K-pop e dorama. Responda escolhendo ou digitando em hangul.",
+    "level_prefix": "TOPIK", "typing_label": "Digitar em hangul",
+    "typing_hint": "Para digitar em hangul, ative o teclado coreano: no Windows, Configurações › Hora e idioma › Idioma › Adicionar “Coreano” (alterne com Win + Espaço e use a tecla 한/영 ou Alt direito); no celular, adicione o teclado coreano.",
+    "lang_js": ROOT / "lang.js", "alphabet_html": ROOT / "alphabet.html",
+}
 
 
 def has_batchim(word: str) -> bool:
@@ -344,18 +347,11 @@ def main():
         "consonants": C.CONSONANTS, "vowels": C.VOWELS, "roman": roman_map(questions),
     }
     choice = listen_choice(questions)
-    data["skills"], skills_css, skills_js = skills_bundle(SK.TEXTS, SK.PROMPTS, SK.ROLEPLAY, choice, romanize)
+    data["skills"], _, _ = skills_bundle(SK.TEXTS, SK.PROMPTS, SK.ROLEPLAY, choice, romanize)
     for item in choice:
         for o in item["options"]:
             data["roman"].setdefault(o, romanize(o))
-    template = (ROOT / "src" / "template.html").read_text(encoding="utf-8")
-    html = (template.replace("{{GUARD}}", GUARD)
-            .replace("{{STYLES}}", (ROOT / "src" / "styles.css").read_text(encoding="utf-8") + skills_css)
-            .replace("{{SKILLS}}", skills_js)
-            .replace("{{DATA}}", "const KDATA = " + json.dumps(data, ensure_ascii=False) + ";")
-            .replace("{{APP}}", (ROOT / "src" / "app.js").read_text(encoding="utf-8"))
-            .replace("{{COUNT}}", f"{len(questions):,}".replace(",", ".")))
-    (PUBLIC / "korean.html").write_text(html, encoding="utf-8", newline="\n")
+    build_app(PAGE, data, PUBLIC / "korean.html")
     counts = {}
     for q in questions:
         counts[q["module"]] = counts.get(q["module"], 0) + 1

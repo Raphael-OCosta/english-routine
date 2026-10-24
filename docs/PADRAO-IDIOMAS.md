@@ -10,7 +10,9 @@ Cada idioma é um app próprio no mesmo site (`/app.html` inglês, `/korean.html
 | Acesso | `functions/api/_shared.js` → `requireActive(env, user, lang)` | assinatura/cortesia/admin por idioma |
 | Progresso | `/api/progress?lang=xx` + `public/assets/cloud-sync.js` | `window.ROUTINE_LANGUAGE = "xx"`, chave `routine-xx-v1` |
 | Fala | `/api/speaking/evaluate` com `language: "xx"` | transcrição no idioma; shadowing por palavras ou sílabas |
+| Treino de questões | `practice/practice.js`, `practice/template.html`, `practice/styles.css`, `practice/build.py` | filtros, rodadas, múltipla escolha × digitar, várias lacunas, pronúncia nas opções, guia, progresso |
 | Habilidades | `skills/skills.js`, `skills/skills.css`, `skills/build.py` | Reading, Writing, Listening (texto + “Ouça e escolha”) e Speaking |
+| Teste de nível | `placement/placement.js`, `placement/template.html`, `placement/build_placement.py`, `placement/bank_<lang>.py` | teste adaptativo (EAP, 3PL), resultado por nível e plano de treino |
 | Painel | `public/assets/dashboard.js` | “Em breve”, botão **Testar** para admin, **Treinar** quando `available` |
 
 O inglês tem implementação própria das habilidades (anterior ao módulo) e grava **o mesmo esquema de eventos**, então históricos e relatórios ficam comparáveis.
@@ -21,13 +23,15 @@ O inglês tem implementação própria das habilidades (anterior ao módulo) e g
 <idioma>/
   content.py          # banco de questões (gramática, vocabulário, …)
   skills_content.py   # TEXTS, PROMPTS, ROLEPLAY
-  build_<idioma>.py   # gera public/<idioma>.html
-  src/template.html   # abas Treinar · Reading · Writing · Listening · Speaking · … · Meu progresso
-  src/styles.css      # variáveis de cor: --card --ink --muted --line --brand --accent --soft --good --good-soft --bad --bad-soft
-  src/app.js          # treino de questões + RoutineSkills.mount(...)
+  lang.js             # window.ROUTINE_APP: lang (code, tts, voice, script, brand, levelPrefix, cheer…), alphabet(), writingChecks(), tutorPrompt()
+  alphabet.html       # conteúdo da aba do alfabeto/sons (Hangul, Pinyin e tons, …)
+  <romanização>.py    # pronúncia escrita (romanize.py no coreano, pinyin.py no chinês)
+  build_<idioma>.py   # gera public/<idioma>.html com practice.build.build_app(PAGE, data, out)
 ```
 
-O template precisa de `<section id="reading|writing|listening|speaking" role="tabpanel">` vazias, de `<div id="skillsHistory">` em “Meu progresso” e dos marcadores `{{GUARD}} {{STYLES}} {{SKILLS}} {{DATA}} {{APP}}`.
+`PAGE` traz os textos da interface: `code, html_lang, brand, brand_word, name, alphabet_tab, eyebrow, headline, intro, level_prefix, typing_label, typing_hint, lang_js, alphabet_html`. `data` traz `questions, modules, guide, roman, skills` e o que o `alphabet()` do idioma usar.
+
+Questão: `{id, module, level (1|2), theme, prompt, text (com ___), answers[0] = exibida (as demais são aceitas ao digitar), distractors, explanation, audio, roman, slots?}`. Com várias lacunas, `slots = [{answers, distractors, label}]`.
 
 ## 3. Esquema de conteúdo das habilidades
 
@@ -74,10 +78,16 @@ Todos com `id`, `time`, `day`. O `cloud-sync` mescla por `id` entre aparelhos e 
 
 ## 6. Checklist de um idioma novo
 
-1. `_languages.js`: entrada com `available: false` e `speech`.
-2. Pasta do idioma com `content.py`, `skills_content.py`, `build_<idioma>.py`, `src/`.
+1. `_languages.js`: entrada com `available: false` e `speech` (o painel mostra “Em breve” e o botão **Testar** para o admin).
+2. Pasta do idioma com `content.py`, `skills_content.py`, `lang.js`, `alphabet.html`, `build_<idioma>.py`.
 3. Romanização/pronúncia (se não for alfabeto latino) com teste contra lista oficial.
 4. Testes: conteúdo (`tests/<idioma>_content_test.py`), fala (`tests/speaking_language_test.mjs`).
 5. Admin testa pelo botão **Testar** no painel.
 6. Revisão por nativo/professor.
 7. Lançar: `available: true`, landing/preços, portal Stripe com troca entre os pacotes.
+
+## 7. Exemplos prontos
+
+- Coreano: `korean/` (hangul, partículas pelo batchim, romanização revisada).
+- Chinês: `chinese/` (tons, pinyin por dicionário, classificadores; ao digitar aceita caracteres ou pinyin com/sem tons).
+- Teste de nível: `placement/bank_en.py` (inglês, CEFR). Para outro idioma, crie `bank_<lang>.py` e uma entrada em `PAGES` com os níveis (TOPIK, HSK…).

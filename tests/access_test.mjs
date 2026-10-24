@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { accessFor } from '../functions/api/_shared.js';
+import { LANGUAGES } from '../functions/api/_languages.js';
 import { onRequestPost, onRequestGet } from '../functions/api/admin/grants.js';
 
 const env = { SUPABASE_URL: 'https://example.supabase.co', SUPABASE_SECRET_KEY: 'sb_secret_test' };
@@ -24,7 +25,7 @@ globalThis.fetch = async (url, options = {}) => {
 };
 
 const user = { id: 'u1', email: 'Amigo@Example.com' };
-assert.deepEqual(await accessFor(env, user, { role: 'admin' }), { active: true, source: 'admin', expires_at: null, languages: ['en', 'ko'], plan_size: 3 });
+assert.deepEqual(await accessFor(env, user, { role: 'admin' }), { active: true, source: 'admin', expires_at: null, languages: Object.keys(LANGUAGES), plan_size: 3 });
 const sub = await accessFor(env, user, { subscription_status: 'active', plan_size: 2, languages: ['en', 'ko', 'xx'] });
 assert.deepEqual(sub.languages, ['en', 'ko']);
 assert.equal(sub.plan_size, 2);
