@@ -218,6 +218,15 @@
   const subscriber = access.source === 'subscription';
   const planSize = subscriber ? Math.max(1, Number(access.plan_size) || 1) : 3;
   const entitled = Array.isArray(access.languages) ? access.languages : [];
+  // Teste de nível de inglês: exclusivo de quem tem acesso ao inglês.
+  const placementBox = document.querySelector('#placementBox');
+  if (placementBox) {
+    placementBox.hidden = !(access.active && entitled.includes('en'));
+    try {
+      const last = JSON.parse(localStorage.getItem('routine-placement-en') || '[]').pop();
+      if (last) document.querySelector('#placementLast').textContent = `Último resultado: ${last.level} (${last.score}/100) em ${new Date(last.date).toLocaleDateString('pt-BR')}.`;
+    } catch (_) { /* sem histórico neste navegador */ }
+  }
   const languageList = document.querySelector('#languageList');
   const languagesStatus = document.querySelector('#languagesStatus');
   const saveLanguages = document.querySelector('#saveLanguages');

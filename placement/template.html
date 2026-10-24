@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{TITLE}}</title>
 <meta name="description" content="{{DESCRIPTION}}">
+<style>html[data-cloud-auth="pending"] body{visibility:hidden}</style>
+<script>document.documentElement.dataset.cloudAuth="pending"</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/assets/require-access.js" data-lang="{{LANG}}"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -64,13 +69,13 @@ details{border-top:1px solid var(--line);padding:10px 0}summary{cursor:pointer;f
 </style>
 </head>
 <body>
-<header class="top"><div class="bar"><a class="brand" href="/">english<span>routine.</span></a><a class="link" href="/login.html">Entrar</a></div></header>
+<header class="top"><div class="bar"><a class="brand" href="/">english<span>routine.</span></a><a class="link" href="/dashboard.html">Minha conta</a></div></header>
 <main>
   <section id="intro" class="card anim">
     <span class="eyebrow">{{EYEBROW}}</span>
     <h1>{{HEADLINE}}</h1>
     <p class="muted">{{INTRO}}</p>
-    <div class="facts"><div><b>{{TOTAL}}</b>questões</div><div><b>~15</b>minutos</div><div><b>{{LEVELS}}</b>níveis CEFR</div><div><b>Grátis</b>sem cadastro</div></div>
+    <div class="facts"><div><b>{{TOTAL}}</b>questões</div><div><b>~15</b>minutos</div><div><b>{{LEVELS}}</b>níveis CEFR</div><div><b>Livre</b>refaça quando quiser</div></div>
     <ul class="tips">
       <li>As perguntas se adaptam: ficam mais difíceis quando você acerta e mais fáceis quando erra.</li>
       <li>Ative o som: há questões de escuta (cada áudio pode ser ouvido 2 vezes).</li>
@@ -100,9 +105,9 @@ details{border-top:1px solid var(--line);padding:10px 0}summary{cursor:pointer;f
     <div id="rLevels" class="scale"></div>
     <h3>Desempenho por tipo de questão</h3>
     <div id="rSkills"></div>
-    <h3>Seu plano no {{BRAND}}</h3>
+    <h3>Seu plano de treino no {{BRAND}}</h3>
     <ul id="rPlan" class="plan"></ul>
-    <div class="foot"><a class="button" href="/login.html?mode=signup">Criar conta e começar</a><button id="rAgain" class="button light">Refazer o teste</button></div>
+    <div class="foot"><a class="button" href="{{APP}}">Começar a treinar</a><button id="rAgain" class="button light">Refazer o teste</button></div>
     <h3>Revisar respostas</h3>
     <div id="rReview"></div>
   </section>

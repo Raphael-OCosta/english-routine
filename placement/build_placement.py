@@ -39,11 +39,11 @@ PAGES = {
         "out": "nivelamento.html", "bank": bank_en.BANK, "lang": "en", "tts": "en-US", "voice": "^en",
         "levels": CEFR, "quota": {"grammar": 18, "reading": 6, "listening": 6},
         "typeLabels": {"grammar": "Gramática", "vocab": "Vocabulário", "reading": "Leitura", "listening": "Escuta"},
-        "title": "Teste de nível de inglês grátis · English Routine",
-        "description": "Descubra seu nível de inglês (A1 a C2) em cerca de 15 minutos com um teste adaptativo gratuito.",
+        "title": "Teste de nível de inglês · English Routine",
+        "description": "Teste de nível adaptativo para assinantes do English Routine (A1 a C2).",
         "eyebrow": "Teste de nível · inglês", "headline": "Descubra seu nível de inglês.",
         "intro": "Um teste adaptativo de gramática, vocabulário, leitura e escuta. Em cerca de 15 minutos você recebe uma estimativa na escala CEFR (A1 a C2) e um plano de treino.",
-        "brand": "English Routine",
+        "brand": "English Routine", "app": "/app.html",
     },
 }
 
@@ -73,7 +73,7 @@ def main():
                 .replace("{{EYEBROW}}", page["eyebrow"]).replace("{{HEADLINE}}", page["headline"])
                 .replace("{{INTRO}}", page["intro"]).replace("{{BRAND}}", page["brand"])
                 .replace("{{TOTAL}}", str(total)).replace("{{LEVELS}}", str(len(page["levels"])))
-                .replace("{{LANG}}", page["lang"]))
+                .replace("{{LANG}}", page["lang"]).replace("{{APP}}", page["app"]))
         assert "{{" not in html
         (PUBLIC / page["out"]).write_text(html, encoding="utf-8", newline="\n")
         print(f"{page['out']}: {len(page['bank'])} itens no banco, {total} por teste")
