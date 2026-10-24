@@ -224,9 +224,9 @@ def build():
                 "Futuro: -(으)ㄹ 거예요.", audio=f"{future_time.get(dic, '내일')} {comp} {fut}.")
         if dic not in no_want:
             want = stem + "고 싶어요"
-            add("kg", "verbos", 1, "querer", f"Diga “quero {pt}”.", f"{comp} ___.",
+            add("kg", "verbos", 1, "querer", f"Diga “quero {pt}” ({dic}).", f"{comp} ___.",
                 [want], [stem + "고 있어요", pres, stem + "싶어요"], "Querer: radical + 고 싶어요.", audio=f"{comp} {want}.")
-        add("kg", "verbos", 1, "negação", f"Negue: “não {pt}”.", f"저는 {comp} ___.",
+        add("kg", "verbos", 1, "negação", f"Negue: “não {pt}” ({dic}).", f"저는 {comp} ___.",
             [neg], [pres, "안 " + bad, neg.replace("안 ", "") + " 안"], "Negação curta: 안 antes do verbo (em X하다 separável: X 안 해요).",
             audio=f"저는 {comp} {neg}.")
     for dic, pt, pres, past in C.ADJECTIVES:

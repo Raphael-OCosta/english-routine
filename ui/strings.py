@@ -328,3 +328,51 @@ INTRO = {
     "it": "domande di vocabolario, falsi amici, verbi, grammatica, frasi da completare, numeri, frasi ed ascolto, pensate per chi parla portoghese.",
     "de": "Aufgaben zu Wortschatz, falschen Freunden, Verben, Grammatik, Lückensätzen, Zahlen, Alltagssätzen und Hören – gemacht für Portugiesischsprachige.",
 }
+
+# Enunciados das questões no idioma estudado (quando a interface está nele). Por idioma: exatos e padrões.
+# O verbo/termo de estudo vem em {0}; glosas em português ({1}) ficam de fora.
+PROMPTS = {
+    "ko": {
+        "exact": {
+            "Complete as três lacunas (tópico, lugar e objeto).": "빈칸 세 개를 채우세요 (주제, 장소, 목적어).",
+            "Complete as duas lacunas.": "빈칸 두 개를 채우세요.",
+            "Complete as duas lacunas (tópico e destino).": "빈칸 두 개를 채우세요 (주제, 목적지).",
+            "Complete as três lacunas (tópico, companhia e destino).": "빈칸 세 개를 채우세요 (주제, 함께하는 사람, 목적지).",
+            "Como se diz em coreano?": "한국어로 뭐라고 해요?",
+            "O que significa?": "무슨 뜻이에요?",
+            "Ouça e escolha a palavra que você ouviu.": "듣고 들은 단어를 고르세요.",
+            "Complete com a partícula de objeto.": "목적격 조사(을/를)를 쓰세요.",
+            "Escolha 에 ou 에서.": "‘에’와 ‘에서’ 중에서 고르세요.",
+            "Complete com a partícula de sujeito.": "주격 조사(이/가)를 쓰세요.",
+            "Complete com a forma correta de “ser”.": "‘이에요/예요’ 중 알맞은 것을 쓰세요.",
+            "Como se lê esta palavra?": "이 단어를 어떻게 읽어요?",
+            "Como se lê esta sílaba?": "이 음절을 어떻게 읽어요?",
+            "Complete com a partícula de tópico (contraste).": "대조의 조사(은/는)를 쓰세요.",
+            "Qual é o som desta vogal?": "이 모음은 어떤 소리예요?",
+            "Qual é o som desta consoante?": "이 자음은 어떤 소리예요?",
+            "Complete com 와 ou 과 (com).": "‘와/과’(함께)를 쓰세요.",
+            "Complete com a partícula “para (alguém)”.": "‘한테/에게’를 쓰세요.",
+            "Complete com 로 ou 으로 (por meio de).": "‘로/으로’(수단)를 쓰세요.",
+            "Complete com a partícula de tópico.": "주제 조사(은/는)를 쓰세요.",
+            "Complete com 와 ou 과 (e / com).": "‘와/과’(그리고/함께)를 쓰세요.",
+            # rótulos das lacunas
+            "tópico": "주제", "lugar da ação": "장소", "objeto": "목적어", "destino": "목적지", "companhia": "함께하는 사람", "negação": "부정",
+        },
+        "patterns": [
+            ["Presente educado de {0} ({1}).", "{0} → 현재형(-아요/어요)으로 쓰세요."],
+            ["Presente de {0} ({1}).", "{0} → 현재형(-아요/어요)으로 쓰세요."],
+            ["Passado de {0} ({1}).", "{0} → 과거형(-았어요/었어요)으로 쓰세요."],
+            ["Futuro de {0} ({1}).", "{0} → 미래형(-(으)ㄹ 거예요)으로 쓰세요."],
+            ["Negue: “não {1}” ({0}).", "{0} → ‘안’으로 부정하세요."],
+            ["Diga “quero {1}” ({0}).", "{0} → ‘-고 싶어요’로 말해 보세요."],
+            ["Complete as lacunas. Use {0} no passado.", "빈칸을 채우세요. ‘{0}’를 과거형으로 쓰세요."],
+            ["Complete as lacunas. Use {0} no presente.", "빈칸을 채우세요. ‘{0}’를 현재형으로 쓰세요."],
+            ["Complete as lacunas. Negue {0} com -지 않아요.", "빈칸을 채우세요. ‘{0}’를 ‘-지 않아요’로 부정하세요."],
+            ["Qual letra tem o som “{0}”?", "“{0}” 소리가 나는 글자는 뭐예요?"],
+            ["Qual vogal tem o som “{0}”?", "“{0}” 소리가 나는 모음은 뭐예요?"],
+            ["Como se diz “{0}”?", "한국어로 어떻게 말해요?"],
+            ["{0} no passado", "‘{0}’ 과거형"],
+            ["{0} no presente", "‘{0}’ 현재형"],
+        ],
+    },
+}

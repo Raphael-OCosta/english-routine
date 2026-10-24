@@ -29,6 +29,10 @@ def language(code: str) -> dict:
     for key, value in (("headline", S.HEADLINE[code]), ("intro", S.INTRO[code])):
         exact[page_field(folder, key)] = value
     patterns = [[row[0], row[i]] for row in S.PATTERNS]
+    # Enunciados das questões (quando o idioma já tem a tradução deles): os padrões específicos vêm antes.
+    prompts = S.PROMPTS.get(code, {})
+    exact.update(prompts.get("exact", {}))
+    patterns = [list(p) for p in prompts.get("patterns", [])] + patterns
     return {"exact": exact, "patterns": patterns}
 
 

@@ -128,7 +128,7 @@ def build_more(add, slot, particle, has_batchim, pick, rng, C):
             if fut:
                 add("ky", "verbos", 1, "futuro", f"Futuro de {dic} ({pt}).", f"{future_time.get(dic, '내일')} {subj} {comp} ___.", [fut],
                     [pres, past, dic], "Futuro: -(으)ㄹ 거예요.", audio=f"{future_time.get(dic, '내일')} {subj} {comp} {fut}.")
-            add("ky", "verbos", 1, "negação", f"Negue: “não {pt}”.", f"{subj} {comp} ___.", [neg], [pres, "안 " + stem + "요", stem + "지 안아요"],
+            add("ky", "verbos", 1, "negação", f"Negue: “não {pt}” ({dic}).", f"{subj} {comp} ___.", [neg], [pres, "안 " + stem + "요", stem + "지 안아요"],
                 "Negação curta com 안 (em X하다 separável: X 안 해요).", audio=f"{subj} {comp} {neg}.")
 
     # ---------------------------------------------------------- kz: partículas com o vocabulário

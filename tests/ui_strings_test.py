@@ -39,3 +39,40 @@ code = "".join((ROOT / p).read_text(encoding="utf-8") for p in ("practice/templa
 dead = [k for k in keys[:40] if k not in code and k not in ("Correto!", "Olá,")]
 assert not dead, dead
 print(f"ui ok: {len(keys)} textos × {len(S.LANGS)} idiomas, {len(S.PATTERNS)} padrões; inglês {len(en)} textos")
+
+
+# ---------------------------------------------------------------- enunciados no idioma estudado
+def compile_pattern(src):
+    out = ""
+    for part in re.split(r"(\{n\}|\{\d\})", src):
+        if part == "{n}":
+            out += r"(\d+(?:[.,]\d+)?)"
+        elif re.fullmatch(r"\{\d\}", part):
+            out += "(.+?)"
+        else:
+            out += re.escape(part)
+    return re.compile("^" + out + "$", re.S)
+
+
+def covered(text, table):
+    if text in table["exact"]:
+        return True
+    return any(compile_pattern(src).match(text) for src, _ in table["patterns"])
+
+
+sys.path.insert(0, str(ROOT / "ui"))
+import build_ui  # noqa: E402
+import json  # noqa: E402
+
+for code, folder in (("ko", "korean"),):
+    table = build_ui.language(code)
+    html = (ROOT / "public" / f"{folder}.html").read_text(encoding="utf-8")
+    start = html.index("window.ROUTINE_DATA = ") + len("window.ROUTINE_DATA = ")
+    data, _ = json.JSONDecoder().raw_decode(html[start:])
+    prompts = {q["prompt"] for q in data["questions"]}
+    labels = {s["label"] for q in data["questions"] for s in q.get("slots", [])}
+    missing = sorted(p for p in prompts | labels if not covered(p, table))
+    assert not missing, (code, missing[:10])
+    for src, dst in S.PROMPTS[code]["patterns"]:
+        assert "{" not in re.sub(r"\{n\}|\{\d\}", "", dst), dst
+    print(f"enunciados {code} ok: {len(prompts)} enunciados e {len(labels)} rótulos cobertos")
