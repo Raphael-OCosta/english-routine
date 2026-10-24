@@ -6,6 +6,8 @@ export const LANGUAGES = {
   en: { name: 'Inglês', brand: 'English Routine', app: '/app.html', available: true, speech: { transcribe: 'en', tokens: 'words' } },
   ko: { name: 'Coreano', brand: 'Korean Routine', app: '/korean.html', available: false, speech: { transcribe: 'ko', tokens: 'syllables' } },
   zh: { name: 'Chinês', brand: 'Chinese Routine', app: '/chinese.html', available: false, speech: { transcribe: 'zh', tokens: 'syllables' } },
+  es: { name: 'Espanhol', brand: 'Spanish Routine', app: '/spanish.html', available: false, speech: { transcribe: 'es', tokens: 'words' } },
+  ja: { name: 'Japonês', brand: 'Japanese Routine', app: '/japanese.html', available: false, speech: { transcribe: 'ja', tokens: 'syllables' } },
 };
 
 // Lookup keys dos preços no Stripe por quantidade de idiomas.

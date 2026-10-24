@@ -18,7 +18,7 @@ SKILLS = HERE.parent / "skills"
 CLOUD_SYNC_VERSION = "20261023-1"
 
 KEYS = ("brand", "brand_word", "name", "alphabet_tab", "eyebrow", "headline", "intro", "level_prefix",
-        "typing_label", "typing_hint", "html_lang")
+        "level1", "level2", "typing_label", "typing_hint", "html_lang")
 
 
 def guard(code: str) -> str:
@@ -30,6 +30,7 @@ def guard(code: str) -> str:
 
 
 def build_app(page: dict, data: dict, out: Path) -> str:
+    page = {"level1": f"{page.get('level_prefix', '')} 1", "level2": f"{page.get('level_prefix', '')} 2", **page}
     missing = [k for k in KEYS if not page.get(k)]
     assert not missing, f"Faltam textos da página: {missing}"
     html = (HERE / "template.html").read_text(encoding="utf-8")

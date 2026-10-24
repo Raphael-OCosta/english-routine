@@ -104,7 +104,8 @@
   const mode = () => (document.querySelector('input[name=mode]:checked')?.value === 'typing' ? 'typing' : 'choice');
   const slotsOf = q => q.slots || [{ answers: q.answers, distractors: q.distractors, label: '' }];
   // Digitação só onde a resposta está no idioma (significados em português ficam na múltipla escolha).
-  const typeable = q => slotsOf(q).every(s => hasScript(s.answers[0]));
+  // `typeable` explícito na questão vale para idiomas de alfabeto latino (espanhol…).
+  const typeable = q => q.typeable ?? slotsOf(q).every(s => hasScript(s.answers[0]));
   const norm = s => String(s).normalize('NFC').replace(/[\s.?!,·~]/g, '').toLowerCase();
   const romanOf = text => (state.showRoman !== false && D.roman[text]) || '';
   const optionLabel = o => {
@@ -172,7 +173,7 @@
     const multi = slots.length > 1;
     answered = false;
     picks = slots.map(() => null);
-    $('qMeta').textContent = `${D.modules[q.module]} · ${L.levelPrefix} ${q.level}${reviewMode ? ' · revisão' : ''}`;
+    $('qMeta').textContent = `${D.modules[q.module]} · ${L.levelNames?.[q.level] || `${L.levelPrefix} ${q.level}`}${reviewMode ? ' · revisão' : ''}`;
     $('qCount').textContent = `${index + 1} de ${round.length}`;
     $('qPrompt').textContent = q.prompt;
     const qText = $('qText');

@@ -111,12 +111,6 @@ h2{font-size:clamp(30px,4.2vw,46px);line-height:1.1;letter-spacing:-1.2px;margin
 .quiz .fb.show{opacity:1}
 @media (max-width:900px){.demo{grid-template-columns:1fr;padding:28px}}
 
-/* números */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:40px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;text-align:center}
-.stat b{display:block;font-size:40px;letter-spacing:-1px;color:var(--brand)}
-.stat span{color:var(--muted)}
-@media (max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}}
 
 /* passos */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px;counter-reset:s}
@@ -218,15 +212,6 @@ h2{font-size:clamp(30px,4.2vw,46px);line-height:1.1;letter-spacing:-1.2px;margin
   </div>
 </div></section>
 
-<section style="padding-top:0"><div class="wrap">
-  <div class="stats">
-    <div class="stat reveal"><b data-count="10500">0</b><span>questões de inglês</span></div>
-    <div class="stat reveal"><b data-count="516">0</b><span>textos de reading</span></div>
-    <div class="stat reveal"><b data-count="1848">0</b><span>questões de coreano</span></div>
-    <div class="stat reveal"><b data-count="7">0</b><span>níveis, do A1 ao C2+</span></div>
-  </div>
-</div></section>
-
 <section class="alt" style="padding-top:20px"><div class="wrap">
   <div class="reveal"><span class="eyebrow">Como começar</span><h2>Três passos, e a rotina anda sozinha.</h2></div>
   <div class="steps">
@@ -269,8 +254,8 @@ const LANGS = [
   { code: 'en', name: 'Inglês', native: 'English', hello: 'Hello!', word: 'inglês', status: 'live', note: '10.500 questões · A1 a C2+' },
   { code: 'ko', name: 'Coreano', native: '한국어', hello: '안녕하세요!', word: 'coreano', status: 'beta', note: 'Hangul e TOPIK 1–2 · K-pop e doramas' },
   { code: 'zh', name: 'Chinês (mandarim)', native: '中文', hello: '你好！', word: 'chinês', status: 'beta', note: 'Pinyin, tons e HSK 1–2' },
-  { code: 'es', name: 'Espanhol', native: 'Español', hello: '¡Hola!', word: 'espanhol', status: 'soon', note: 'Em breve' },
-  { code: 'ja', name: 'Japonês', native: '日本語', hello: 'こんにちは!', word: 'japonês', status: 'soon', note: 'Em breve' },
+  { code: 'es', name: 'Espanhol', native: 'Español', hello: '¡Hola!', word: 'espanhol', status: 'beta', note: 'A1–A2 · falsos amigos para brasileiros' },
+  { code: 'ja', name: 'Japonês', native: '日本語', hello: 'こんにちは!', word: 'japonês', status: 'beta', note: 'Hiragana, katakana e JLPT N5–N4' },
   { code: 'fr', name: 'Francês', native: 'Français', hello: 'Bonjour !', word: 'francês', status: 'soon', note: 'Em breve' },
   { code: 'it', name: 'Italiano', native: 'Italiano', hello: 'Ciao!', word: 'italiano', status: 'soon', note: 'Em breve' },
   { code: 'de', name: 'Alemão', native: 'Deutsch', hello: 'Hallo!', word: 'alemão', status: 'soon', note: 'Em breve' },

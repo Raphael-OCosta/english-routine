@@ -312,7 +312,9 @@
       const m = writingMetrics(text);
       if (!m.units) { $(`${tag}WriteStatus`).textContent = 'Escreva algumas frases primeiro.'; return; }
       const enough = m.units >= p.units && m.lines >= p.lines;
-      const connectors = (L.connectors || []).filter(c => text.includes(c));
+      // Em idiomas com espaço, conector só conta como palavra inteira (o “y” de “Yo” não vale).
+      const hasWord = c => ` ${text.toLowerCase().replace(/[^\p{L}\s]/gu, ' ').replace(/\s+/g, ' ')} `.includes(` ${c.toLowerCase()} `);
+      const connectors = (L.connectors || []).filter(c => (L.unit === 'words' ? hasWord(c) : text.includes(c)));
       const notes = (cfg.writingChecks?.(text, p) || []).map(n => `<li>${n}</li>`).join('');
       writeEvaluation = { text, ...m };
       $(`${tag}WriteSave`).disabled = false;

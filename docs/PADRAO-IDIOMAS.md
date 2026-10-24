@@ -90,4 +90,11 @@ Todos com `id`, `time`, `day`. O `cloud-sync` mescla por `id` entre aparelhos e 
 
 - Coreano: `korean/` (hangul, partículas pelo batchim, romanização revisada).
 - Chinês: `chinese/` (tons, pinyin por dicionário, classificadores; ao digitar aceita caracteres ou pinyin com/sem tons).
+- Espanhol: `spanish/` (alfabeto latino: questões marcam `typeable`; conjugação por regra + irregulares; falsos amigos para brasileiros; `levelNames` A1/A2).
+- Japonês: `japanese/` (hiragana/katakana, leituras de kanji por dicionário, romaji Hepburn com partículas wa/e/o; ao digitar aceita kana ou romaji; `levelNames` N5/N4).
+
+Dicas gerais:
+- Idiomas de alfabeto latino não conseguem decidir pelo `script` o que é digitável: marque `typeable: true/false` em cada questão.
+- `lang.levelNames` dá nome aos níveis (A1/A2, N5/N4); sem ele usa `levelPrefix + número` (TOPIK 1, HSK 2).
+- `lang.cheer` e `lang.praise` são as frases de acerto/elogio no idioma.
 - Teste de nível: `placement/bank_en.py` (inglês, CEFR). Para outro idioma, crie `bank_<lang>.py` e uma entrada em `PAGES` com os níveis (TOPIK, HSK…).
