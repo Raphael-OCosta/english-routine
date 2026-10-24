@@ -13,7 +13,11 @@ from skills.build import skills_bundle  # noqa: E402
 
 qs = b.build()
 b.validate(qs)
-assert len(qs) >= 1800, len(qs)
+assert len(qs) >= 9500, len(qs)
+# toda frase de áudio tem pinyin conhecido
+for q in qs:
+    if q["audio"]:
+        pinyin(q["audio"])
 assert {q["module"] for q in qs} == set(b.MODULES)
 
 # Pinyin por dicionário: leituras ambíguas resolvidas pela palavra inteira.

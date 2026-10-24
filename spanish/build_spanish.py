@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 import content as C
+import extend
 import skills_content as SK
 
 ROOT = Path(__file__).resolve().parent
@@ -42,6 +43,8 @@ def present(verb: str, person: int) -> str:
 def past(verb: str, person: int) -> str:
     if verb in C.IRREGULAR_PAST:
         return C.IRREGULAR_PAST[verb][person]
+    if person == 0 and verb[-3:] in ("car", "gar", "zar"):  # sacar → saqué, pagar → pagué, cruzar → crucé
+        return verb[:-3] + {"car": "qué", "gar": "gué", "zar": "cé"}[verb[-3:]]
     return verb[:-2] + ENDINGS_PAST[verb[-2:]][person]
 
 
@@ -157,6 +160,8 @@ def build():
         add("ep", "frases", 1, "frases", "O que significa?", es, [pt], pick(rng, [p for _, p, _ in C.PHRASES if p != pt], [pt]), f"{es} = {pt}{note}.", audio=es)
         add("ep", "frases", 1, "frases", "Como se diz em espanhol?", pt, [es], pick(rng, [e for e, p, _ in C.PHRASES if p != pt], [es]),
             f"{pt} = {es}{note}.", audio=es, typeable=True)
+    # Expansão (~10 mil): sempre depois das originais, com prefixos novos.
+    extend.build_more(add, slot, pick, rng, C, present, past, article, to_place)
     return questions
 
 

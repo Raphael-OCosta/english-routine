@@ -10,7 +10,7 @@ import build_korean as b  # noqa: E402
 qs = b.build()
 b.validate(qs)
 
-assert len(qs) >= 1000, len(qs)
+assert len(qs) >= 9500, len(qs)
 assert {q["module"] for q in qs} == set(b.MODULES)
 for q in qs:
     assert q["level"] in (1, 2), q["id"]

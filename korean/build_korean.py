@@ -11,6 +11,7 @@ from pathlib import Path
 import sys
 
 import content as C
+import extend
 import skills_content as SK
 from romanize import has_syllable, romanize
 
@@ -283,6 +284,9 @@ def build():
         note = f" ({ctx})" if ctx else ""
         add("kf", "frases", 1, "frases", "O que significa?", ko, [pt], pick(rng, others_pt, [pt]), f"{ko} = {pt}{note}.", audio=ko)
         add("kf", "frases", 1, "frases", "Como se diz em coreano?", pt, [ko], pick(rng, others_ko, [ko]), f"{pt} = {ko}{note}.", audio=ko)
+
+    # Expansão (~10 mil): sempre depois das originais, com prefixos novos.
+    extend.build_more(add, slot, particle, has_batchim, pick, rng, C)
     return questions
 
 

@@ -95,6 +95,14 @@ MAXLEN = max(len(k) for k in DICT)
 PUNCT = {"。": ".", "，": ",", "？": "?", "！": "!", "、": ",", "：": ":", "；": ";", "“": "“", "”": "”", "（": "(", "）": ")", "…": "…", "—": "—", "《": "«", "》": "»"}
 
 
+def add_words(words: dict) -> None:
+    """Acrescenta palavras ao dicionário (expansões de conteúdo)."""
+    global MAXLEN
+    for k, v in words.items():
+        DICT.setdefault(k, v)
+    MAXLEN = max(len(k) for k in DICT)
+
+
 def is_hanzi(ch: str) -> bool:
     return "一" <= ch <= "鿿" or ch == "〇"
 

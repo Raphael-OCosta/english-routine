@@ -10,7 +10,7 @@ from skills.build import skills_bundle  # noqa: E402
 
 def load(folder, names):
     """Importa os módulos de uma pasta de idioma isolando nomes repetidos (content, skills_content…)."""
-    for name in ("content", "skills_content", "kana", "readings", *names):
+    for name in ("content", "skills_content", "kana", "readings", "extend", *names):
         sys.modules.pop(name, None)
     sys.path.insert(0, str(ROOT / folder))
     try:
@@ -23,7 +23,7 @@ def load(folder, names):
 b, C, SK = load("spanish", ["build_spanish", "content", "skills_content"])
 qs = b.build()
 b.validate(qs)
-assert len(qs) >= 1500, len(qs)
+assert len(qs) >= 9500, len(qs)
 assert {q["module"] for q in qs} == set(b.MODULES)
 # conjugação: regulares e irregulares
 assert b.present("hablar", 0) == "hablo" and b.present("comer", 3) == "comemos" and b.present("vivir", 5) == "viven"
@@ -60,6 +60,12 @@ for ja, rom in sentences.items():
     assert K.romaji(ja) == rom, (ja, K.romaji(ja))
 for w, kana, *_ in C.VOCAB:
     assert K.reading(w) == kana, (w, K.reading(w), kana)
+# toda frase (texto e áudio) tem leitura conhecida: nenhum kanji sem romaji
+for q in qs:
+    for t in (q["audio"], q["text"].replace("___", "")):
+        if t and any(K.is_kanji(c) or K.is_kana(c) for c in t):
+            K.romaji(t)
+assert len(qs) >= 9500, len(qs)
 skills, _, _ = skills_bundle(SK.TEXTS, SK.PROMPTS, SK.ROLEPLAY, b.listen_choice(qs), K.romaji)
 assert len(skills["texts"]) >= 20 and len(skills["prompts"]) >= 16
 for page in ("spanish.html", "japanese.html"):

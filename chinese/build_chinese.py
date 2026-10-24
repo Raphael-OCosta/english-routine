@@ -11,8 +11,9 @@ import unicodedata
 from pathlib import Path
 
 import content as C
+import extend
 import skills_content as SK
-from pinyin import is_hanzi, pinyin
+from pinyin import add_words, is_hanzi, pinyin
 
 ROOT = Path(__file__).resolve().parent
 PUBLIC = ROOT.parent / "public"
@@ -181,6 +182,10 @@ def build():
         note = f" ({ctx})" if ctx else ""
         add("zf", "frases", 1, "frases", "O que significa?", hz, [pt], pick(rng, others_pt, [pt]), f"{hz} ({py}) = {pt}{note}.", audio=hz)
         add("zf", "frases", 1, "frases", "Como se diz em chinês?", pt, [hz], pick(rng, others_hz, [hz]), f"{pt} = {hz} ({py}){note}.", audio=hz)
+
+    # Expansão (~10 mil): sempre depois das originais, com prefixos novos.
+    add_words(extend.EXTRA_READINGS)
+    extend.build_more(add, slot, pick, rng, C)
 
     # Digitação: aceitar pinyin com e sem tons onde a resposta é em caracteres.
     for q in questions:

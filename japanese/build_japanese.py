@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 import content as C
+import extend
 import kana as K
 import readings as R
 import skills_content as SK
@@ -176,6 +177,9 @@ def build():
         note = f" ({ctx})" if ctx else ""
         add("jf", "frases", 1, "frases", "O que significa?", ja, [pt], pick(rng, [p for _, p, _ in C.PHRASES if p != pt], [pt]), f"{ja} = {pt}{note}.", audio=ja)
         add("jf", "frases", 1, "frases", "Como se diz em japonês?", pt, accept(ja), pick(rng, [j for j, p, _ in C.PHRASES if p != pt], [ja]), f"{pt} = {ja}{note}.", audio=ja)
+
+    # Expansão (~10 mil): sempre depois das originais, com prefixos novos.
+    extend.build_more(add, slot, accept, pick, rng, C, K)
     return questions
 
 
