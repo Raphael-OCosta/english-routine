@@ -17,6 +17,7 @@ HERE = Path(__file__).resolve().parent
 SKILLS = HERE.parent / "skills"
 CLOUD_SYNC_VERSION = "20261023-1"
 UI_VERSION = "20261025-1"
+TTS_VERSION = "20261025-1"
 
 KEYS = ("brand", "brand_word", "name", "alphabet_tab", "eyebrow", "headline", "intro", "level_prefix",
         "level1", "level2", "typing_label", "typing_hint", "html_lang")
@@ -27,7 +28,8 @@ def ui_loader(code: str) -> str:
     dict_tag = f'<script src="/assets/ui/{code}.js?v={UI_VERSION}"><\\/script>'
     return (f'<script>window.ROUTINE_UI_VERSION="{UI_VERSION}";'
             f'try{{if(localStorage.getItem("routine-ui-lang-{code}")==="{code}")document.write(\'{dict_tag}\')}}catch(e){{}}</script>'
-            f'<script src="/assets/ui-language.js?v={UI_VERSION}"></script>')
+            f'<script src="/assets/ui-language.js?v={UI_VERSION}"></script>'
+            f'<script src="/assets/tts-fix.js?v={TTS_VERSION}"></script>')
 
 
 # Fonte com os caracteres do idioma (a Plus Jakarta Sans só cobre o alfabeto latino).
