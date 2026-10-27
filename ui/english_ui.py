@@ -213,8 +213,11 @@ EXACT = [
     ("Reiniciar todo o progresso", "Reset all progress"),
     ("Não foi possível salvar a reinicialização. Seu progresso atual foi mantido. Tente novamente após verificar o armazenamento do navegador.",
      "Couldn't save the reset. Your current progress was kept. Try again after checking the browser storage."),
-    ("10.500 questões, incluindo desafios com múltiplas lacunas e 500 de linking words. Tempos verbais, modais, contrações, conectores e muito mais.",
-     "10,500 questions, including multi-blank challenges and 500 linking-word items. Tenses, modals, contractions, connectors and much more."),
+    ("11.024 questões, incluindo desafios com múltiplas lacunas, 500 de linking words e 524 de phrasal verbs. Tempos verbais, modais, contrações, conectores, phrasal verbs e muito mais.",
+     "11,024 questions, including multi-blank challenges, 500 linking-word items and 524 phrasal-verb items. Tenses, modals, contractions, connectors, phrasal verbs and much more."),
+    ("Complete com a partícula do phrasal verb.", "Complete with the particle of the phrasal verb."),
+    ("Complete com o phrasal verb que tem o sentido indicado, na forma correta.", "Complete with the phrasal verb that has the given meaning, in the correct form."),
+    ("Complete com o phrasal verb e o pronome na posição certa.", "Complete with the phrasal verb and the pronoun in the right position."),
     ("Créditos e licenças do corretor offline", "Offline spell checker credits and licenses"), ("Textos de prática originais. Referências pedagógicas:", "Original practice texts. Teaching references:"),
     (". Corretor", ". Spell checker"), ("e dicionário", "and dictionary"),
     ("Não foi possível ler o histórico. Esta sessão ficará em memória; gere um backup para preservá-la. O conteúdo anterior não será sobrescrito.",
@@ -274,6 +277,7 @@ PATTERNS = [
     ("Confiança da transcrição: {0}%", "Transcript confidence: {0}%"), ("Correspondência com o trecho: {0}% · confiança da transcrição: {0}%", "Match with the passage: {0}% · transcript confidence: {0}%"),
     ("Salvo na nuvem · {n} respostas", "Saved to the cloud · {n} answers"), ("Salvo na nuvem · {n} resposta", "Saved to the cloud · {n} answer"),
     ("{0} · {n} questões", "{0} · {n} questions"),
+    ("({0} + partícula) · preencha a lacuna.", "({0} + particle) · fill in the blank."),
 ]
 
 
