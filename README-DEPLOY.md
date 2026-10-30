@@ -81,6 +81,8 @@ O diretório publicável será `saas/public` e as Functions ficam em `saas/funct
    - `OPENAI_API_KEY` — segredo, usado apenas no servidor
    - `OPENAI_TRANSCRIBE_MODEL` — `gpt-4o-mini-transcribe`
    - `AI_DAILY_LIMIT` — limite por aluno/dia; sugestão inicial: `10`
+   - `TELEGRAM_BOT_TOKEN` — segredo, opcional: aviso de vendas no Telegram
+   - `TELEGRAM_CHAT_ID` — opcional: conversa que recebe os avisos
 6. Faça o primeiro deploy usando o subdomínio `pages.dev`.
 7. Teste cadastro, confirmação de e-mail, compra com cartão de teste, webhook, acesso, sincronização e cancelamento.
 8. Só então conecte o domínio próprio e altere Supabase/Stripe para a URL definitiva.

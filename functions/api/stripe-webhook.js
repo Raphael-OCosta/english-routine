@@ -1,5 +1,6 @@
 import { json, adminRest } from './_shared.js';
 import { cleanLanguages, planSizeFromLookupKey } from './_languages.js';
+import { notifyTelegram, saleMessage } from './_telegram.js';
 
 const enc = new TextEncoder();
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -94,6 +95,10 @@ export async function onRequestPost({ request, env }) {
         body: JSON.stringify(patch),
       });
     }
+
+    // Por último: se o banco falhar, o Stripe reenvia o evento e o aviso não sai em dobro.
+    const message = saleMessage(event);
+    if (message) await notifyTelegram(env, message);
 
     return json({ received: true });
   } catch (error) {

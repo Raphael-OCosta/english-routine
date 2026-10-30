@@ -36,6 +36,7 @@ export async function onRequestPost({ request, env }) {
       'line_items[0][quantity]': '1',
       success_url: `${origin}/dashboard.html?checkout=success`,
       cancel_url: `${origin}/dashboard.html?checkout=cancelled`,
+      'metadata[languages]': languages.join(','),
       'subscription_data[metadata][user_id]': user.id,
       'subscription_data[metadata][languages]': languages.join(','),
       allow_promotion_codes: 'true',
